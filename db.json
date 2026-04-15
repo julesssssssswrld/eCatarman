@@ -265,40 +265,6 @@
         }
       ],
       "routedTo": []
-    },
-    {
-      "id": "TXN-2026-0007",
-      "serviceId": "civil-registry",
-      "serviceName": "Civil Registry",
-      "departmentId": "civil-registry",
-      "departmentName": "Civil Registry Office",
-      "status": "Received",
-      "formData": {
-        "requestType": "Birth Certificate",
-        "purpose": "Personal Copy",
-        "numberOfCopies": "1",
-        "firstName": "Jules Ian",
-        "middleName": "Cajandab",
-        "lastName": "Tomacas",
-        "email": "tomacasjulesiancajandab@gmail.com",
-        "contactNumber": "09615605615",
-        "address": "2434, Old Capitol Road, Brgy. Dalakit",
-        "ownDocument": "Yes",
-        "relationship": "",
-        "ownerFirstName": "",
-        "ownerMiddleName": "",
-        "ownerLastName": "",
-        "dateOfEvent": "",
-        "placeOfEvent": "",
-        "fatherName": "",
-        "motherMaidenName": ""
-      },
-      "citizenName": "Jules Ian Tomacas",
-      "citizenEmail": "tomacasjulesiancajandab@gmail.com",
-      "submittedAt": "2026-04-15T03:57:25.906Z",
-      "updatedAt": "2026-04-15T03:57:25.907Z",
-      "notes": [],
-      "routedTo": []
     }
   ],
   "demoLoaded": true

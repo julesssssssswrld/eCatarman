@@ -354,12 +354,75 @@
             input.placeholder = "Enter " + field.label.toLowerCase();
           }
 
+          // Add Strict Input Validation
+          if (input.tagName === "INPUT") {
+            if (field.type === "email" || field.name.toLowerCase().includes("email")) {
+              input.type = "email";
+              input.pattern = "[A-Za-z0-9._%+\\-]+@[A-Za-z0-9.\\-]+\\.[A-Za-z]{2,}$";
+              input.title = "Must be a valid email address.";
+            } else if (field.name.toLowerCase().includes("contact") || field.name.toLowerCase().includes("phone") || field.name.toLowerCase().includes("mobile")) {
+              input.type = "tel";
+              input.pattern = "^[0-9\\+\\s\\-]{11,}$";
+              input.title = "Must be a valid phone number (at least 11 digits).";
+              input.minLength = 11;
+              input.maxLength = 15;
+            } else if (field.type === "date") {
+              var today = new Date().toISOString().split("T")[0];
+              input.max = today; // Prevent future dates
+            } else if (field.type === "text" || !field.type) {
+              if (field.required) {
+                input.pattern = "^.*\\S+.*$"; // At least one non-whitespace character
+                input.title = "This field cannot be empty or only spaces.";
+              }
+              if (field.name.toLowerCase().includes("name")) {
+                input.pattern = "^[A-Za-z\\s\\-\\.,']{2,}$";
+                input.title = "Must contain at least 2 characters and only letters, spaces, hyphens, and standard punctuation.";
+              }
+            }
+          }
+
           input.name = field.name;
           input.id = "field-" + field.name;
           if (field.required) input.required = true;
 
+          // Real-time inline validation
+          var errMsg = document.createElement("span");
+          errMsg.className = "form-error-msg";
+          errMsg.style.display = "none";
+
+          function validateField(el) {
+            if (!el.checkValidity()) {
+              errMsg.textContent = el.validationMessage || "Invalid input.";
+              errMsg.style.display = "block";
+              el.classList.add("form-input--error");
+              return false;
+            } else {
+              errMsg.style.display = "none";
+              el.classList.remove("form-input--error");
+              return true;
+            }
+          }
+
+          input.addEventListener("blur", function () { validateField(input); });
+          input.addEventListener("input", function () {
+            if (input.classList.contains("form-input--error")) validateField(input);
+          });
+
           group.appendChild(label);
           group.appendChild(input);
+          group.appendChild(errMsg);
+
+          // Conditional visibility (showWhen)
+          if (field.showWhen) {
+            group.style.display = "none";
+            group.dataset.showWhenField = field.showWhen.field;
+            group.dataset.showWhenValue = field.showWhen.value;
+            // Disable hidden required fields so they don't block submission
+            if (input.required) {
+              input.dataset.conditionalRequired = "true";
+              input.required = false;
+            }
+          }
 
           // If this IS the gate field, attach change listener
           if (gateField && field.name === gateField.name) {
@@ -391,6 +454,43 @@
 
         form.appendChild(gatedContainer);
 
+        // Wire up showWhen listeners — find all trigger fields and toggle dependent fields
+        var allTriggerFields = {};
+        form.querySelectorAll("[data-show-when-field]").forEach(function (grp) {
+          var triggerName = grp.dataset.showWhenField;
+          if (!allTriggerFields[triggerName]) allTriggerFields[triggerName] = [];
+          allTriggerFields[triggerName].push(grp);
+        });
+
+        Object.keys(allTriggerFields).forEach(function (triggerName) {
+          var triggerEl = form.querySelector("[name='" + triggerName + "']");
+          if (!triggerEl) return;
+
+          triggerEl.addEventListener("change", function () {
+            var currentVal = triggerEl.value;
+            allTriggerFields[triggerName].forEach(function (grp) {
+              var expectedVal = grp.dataset.showWhenValue;
+              var inputEl = grp.querySelector("input, select, textarea");
+              if (currentVal === expectedVal) {
+                grp.style.display = "";
+                grp.style.animation = "fadeSlideIn 0.3s ease";
+                if (inputEl && inputEl.dataset.conditionalRequired === "true") {
+                  inputEl.required = true;
+                }
+              } else {
+                grp.style.display = "none";
+                if (inputEl) {
+                  inputEl.value = "";
+                  inputEl.required = false;
+                  inputEl.classList.remove("form-input--error");
+                  var err = grp.querySelector(".form-error-msg");
+                  if (err) err.style.display = "none";
+                }
+              }
+            });
+          });
+        });
+
         var submitBtn = document.createElement("button");
         submitBtn.type = "submit";
         submitBtn.className = "form-submit form-submit--disabled";
@@ -400,9 +500,39 @@
 
         form.addEventListener("submit", function (ev) {
           ev.preventDefault();
+
+          // Validate all visible required fields
+          var allValid = true;
+          form.querySelectorAll("input, select, textarea").forEach(function (el) {
+            var parentGroup = el.closest(".form-group");
+            if (parentGroup && parentGroup.style.display === "none") return; // skip hidden
+            if (!el.checkValidity()) {
+              allValid = false;
+              el.classList.add("form-input--error");
+              var errEl = parentGroup ? parentGroup.querySelector(".form-error-msg") : null;
+              if (errEl) {
+                errEl.textContent = el.validationMessage || "This field is required.";
+                errEl.style.display = "block";
+              }
+            }
+          });
+
+          if (!allValid) {
+            // Scroll to first error
+            var firstErr = form.querySelector(".form-input--error");
+            if (firstErr) firstErr.scrollIntoView({ behavior: "smooth", block: "center" });
+            return;
+          }
+
           var formData = {};
           svc.fields.forEach(function (field) {
-            if (field.type === "section") return; // skip section headers
+            if (field.type === "section") return;
+            // Skip hidden conditional fields
+            var grp = form.querySelector("#field-" + field.name);
+            if (grp) {
+              var parentGroup = grp.closest(".form-group");
+              if (parentGroup && parentGroup.style.display === "none") return;
+            }
             var el = form.querySelector("[name='" + field.name + "']");
             formData[field.name] = el ? el.value : "";
           });
