@@ -1,0 +1,255 @@
+{
+  "requests": [
+    {
+      "id": "TXN-2026-0001",
+      "serviceId": "business",
+      "serviceName": "Business Permits",
+      "departmentId": "bplo",
+      "departmentName": "Business Permit & Licensing Office",
+      "status": "Processing",
+      "formData": {
+        "serviceType": "New Business Permit",
+        "modeOfPayment": "Annual",
+        "ownerName": "Maria Santos",
+        "email": "maria@email.com",
+        "sex": "Female",
+        "contactNumber": "09171234567",
+        "tinNo": "123-456-789-000",
+        "ownerAddress": "Brgy. Dalakit, Catarman",
+        "businessName": "Catarman General Store",
+        "businessAddress": "National Highway, Brgy. Dalakit, Catarman",
+        "barangay": "Dalakit",
+        "businessType": "Retail / Sari-Sari Store",
+        "dtiSecNo": "DTI-08-2025-00412",
+        "capitalInvestment": "250000",
+        "lastYearGross": "0",
+        "floorArea": "48"
+      },
+      "citizenName": "Maria Santos",
+      "citizenEmail": "maria@email.com",
+      "submittedAt": "2026-04-10T08:30:00.000Z",
+      "updatedAt": "2026-04-12T14:20:00.000Z",
+      "notes": [
+        {
+          "text": "Application received and verified.",
+          "status": "Received",
+          "timestamp": "2026-04-10T08:30:00.000Z"
+        },
+        {
+          "text": "Documents complete. Forwarded for assessment.",
+          "status": "Under Review",
+          "timestamp": "2026-04-11T09:15:00.000Z"
+        },
+        {
+          "text": "Processing fees computed. Awaiting payment.",
+          "status": "Processing",
+          "timestamp": "2026-04-12T14:20:00.000Z"
+        }
+      ],
+      "routedTo": [
+        "treasurer"
+      ]
+    },
+    {
+      "id": "TXN-2026-0002",
+      "serviceId": "cedula",
+      "serviceName": "Cedula",
+      "departmentId": "treasurer",
+      "departmentName": "Municipal Treasurer's Office",
+      "status": "Completed",
+      "formData": {
+        "taxGroupType": "Individual",
+        "fullName": "Juan Dela Cruz",
+        "email": "juan@email.com",
+        "dateOfBirth": "1985-06-15",
+        "placeOfBirth": "Catarman, Northern Samar",
+        "civilStatus": "Married",
+        "sex": "Male",
+        "citizenship": "Filipino",
+        "address": "Purok 3, Brgy. UEP, Catarman",
+        "barangay": "UEP",
+        "contactNumber": "09281234567",
+        "profession": "Teacher",
+        "grossIncome": "420000",
+        "salaryIncome": "420000"
+      },
+      "citizenName": "Juan Dela Cruz",
+      "citizenEmail": "juan@email.com",
+      "submittedAt": "2026-04-08T10:00:00.000Z",
+      "updatedAt": "2026-04-09T15:00:00.000Z",
+      "notes": [
+        {
+          "text": "CTC application received.",
+          "status": "Received",
+          "timestamp": "2026-04-08T10:00:00.000Z"
+        },
+        {
+          "text": "CTC issued. Ready for pickup.",
+          "status": "Completed",
+          "timestamp": "2026-04-09T15:00:00.000Z"
+        }
+      ],
+      "routedTo": []
+    },
+    {
+      "id": "TXN-2026-0003",
+      "serviceId": "building",
+      "serviceName": "Building Permits",
+      "departmentId": "obo",
+      "departmentName": "Office of the Building Official",
+      "status": "Under Review",
+      "formData": {
+        "permitType": "New Building Permit",
+        "scopeOfWork": "New Construction",
+        "applicantName": "Pedro Reyes",
+        "email": "pedro@email.com",
+        "contactNumber": "09351234567",
+        "ownerAddress": "Brgy. Cawayan, Catarman",
+        "projectAddress": "Lot 15, Brgy. Cawayan, Catarman",
+        "barangay": "Cawayan",
+        "useOrCharacter": "Residential",
+        "numberOfStoreys": "2",
+        "totalFloorArea": "120",
+        "totalEstimatedCost": "2500000",
+        "projectDescription": "Two-storey residential building with 3 bedrooms, 2 bathrooms, and carport"
+      },
+      "citizenName": "Pedro Reyes",
+      "citizenEmail": "pedro@email.com",
+      "submittedAt": "2026-04-13T07:45:00.000Z",
+      "updatedAt": "2026-04-14T10:30:00.000Z",
+      "notes": [
+        {
+          "text": "Building permit application received.",
+          "status": "Received",
+          "timestamp": "2026-04-13T07:45:00.000Z"
+        },
+        {
+          "text": "Under review. Requires zoning clearance.",
+          "status": "Under Review",
+          "timestamp": "2026-04-14T10:30:00.000Z"
+        }
+      ],
+      "routedTo": [
+        "zoning"
+      ]
+    },
+    {
+      "id": "TXN-2026-0004",
+      "serviceId": "civil-registry",
+      "serviceName": "Civil Registry",
+      "departmentId": "civil-registry",
+      "departmentName": "Civil Registry Office",
+      "status": "For Release",
+      "formData": {
+        "requestType": "Birth Certificate",
+        "purpose": "Personal Copy",
+        "numberOfCopies": "2",
+        "firstName": "Ana",
+        "middleName": "Lopez",
+        "lastName": "Rizal",
+        "email": "ana@email.com",
+        "contactNumber": "09191234567",
+        "address": "Brgy. Narra, Catarman",
+        "ownDocument": "Yes",
+        "dateOfEvent": "1998-03-22",
+        "placeOfEvent": "Catarman, Northern Samar",
+        "fatherName": "Jose Rizal",
+        "motherMaidenName": "Teodora Lopez"
+      },
+      "citizenName": "Ana Rizal",
+      "citizenEmail": "ana@email.com",
+      "submittedAt": "2026-04-11T13:20:00.000Z",
+      "updatedAt": "2026-04-14T16:00:00.000Z",
+      "notes": [
+        {
+          "text": "Request for birth certificate received.",
+          "status": "Received",
+          "timestamp": "2026-04-11T13:20:00.000Z"
+        },
+        {
+          "text": "Document verified and printed. For release.",
+          "status": "For Release",
+          "timestamp": "2026-04-14T16:00:00.000Z"
+        }
+      ],
+      "routedTo": []
+    },
+    {
+      "id": "TXN-2026-0005",
+      "serviceId": "assessor",
+      "serviceName": "Real Property Assessment",
+      "departmentId": "assessor",
+      "departmentName": "Municipal Assessor's Office",
+      "status": "Received",
+      "formData": {
+        "serviceType": "Transfer of Ownership",
+        "propertyOwner": "Elena Magtanggol",
+        "email": "elena@email.com",
+        "contactNumber": "09561234567",
+        "ownerAddress": "Brgy. Gebulwangan, Catarman",
+        "taxDecNo": "TD-2024-0872",
+        "pinNo": "PIN-08-012-0421",
+        "propertyLocation": "Brgy. Gebulwangan, Catarman",
+        "barangay": "Gebulwangan",
+        "classification": "Residential",
+        "area": "300 sq.m.",
+        "boundNorth": "Lot 23 - Garcia",
+        "boundSouth": "Barangay Road",
+        "previousOwner": "Ricardo Magtanggol",
+        "modeOfTransfer": "Succession/Inheritance"
+      },
+      "citizenName": "Elena Magtanggol",
+      "citizenEmail": "elena@email.com",
+      "submittedAt": "2026-04-15T06:10:00.000Z",
+      "updatedAt": "2026-04-15T06:10:00.000Z",
+      "notes": [],
+      "routedTo": []
+    },
+    {
+      "id": "TXN-2026-0006",
+      "serviceId": "zoning",
+      "serviceName": "Zoning",
+      "departmentId": "zoning",
+      "departmentName": "Zoning Office",
+      "status": "Processing",
+      "formData": {
+        "serviceType": "Locational Clearance",
+        "applicantName": "Roberto Guzman",
+        "email": "robert@email.com",
+        "contactNumber": "09451234567",
+        "applicantAddress": "Brgy. Caltabangan, Catarman",
+        "projectName": "Guzman Hardware & Construction Supply",
+        "projectLocation": "National Highway, Brgy. Caltabangan",
+        "barangay": "Caltabangan",
+        "projectType": "Commercial",
+        "totalLotArea": "200",
+        "totalFloorArea": "150",
+        "numberOfStoreys": "1",
+        "projectDescription": "Single-storey commercial building for hardware and construction supply retail"
+      },
+      "citizenName": "Roberto Guzman",
+      "citizenEmail": "robert@email.com",
+      "submittedAt": "2026-04-09T11:00:00.000Z",
+      "updatedAt": "2026-04-13T09:30:00.000Z",
+      "notes": [
+        {
+          "text": "Locational clearance application received.",
+          "status": "Received",
+          "timestamp": "2026-04-09T11:00:00.000Z"
+        },
+        {
+          "text": "Site inspection scheduled.",
+          "status": "Under Review",
+          "timestamp": "2026-04-11T08:00:00.000Z"
+        },
+        {
+          "text": "Site inspection completed. Processing clearance.",
+          "status": "Processing",
+          "timestamp": "2026-04-13T09:30:00.000Z"
+        }
+      ],
+      "routedTo": []
+    }
+  ],
+  "demoLoaded": true
+}
