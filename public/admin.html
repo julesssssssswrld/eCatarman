@@ -197,15 +197,57 @@
       }
     });
 
+    // Client-side brute force protection
+    var loginAttempts = 0;
+    var loginLocked = false;
+    var MAX_ATTEMPTS = 5;
+    var LOCKOUT_SECONDS = 60;
+
     document.getElementById("login-form").addEventListener("submit", function (e) {
       e.preventDefault();
+
+      if (loginLocked) {
+        return;
+      }
+
       var username = document.getElementById("username").value;
       var password = document.getElementById("password").value;
+      var errorEl = document.getElementById("login-error");
 
       if (eCatarman.login(username, password)) {
         window.location.replace("/dashboard");
       } else {
-        document.getElementById("login-error").classList.add("visible");
+        loginAttempts++;
+
+        if (loginAttempts >= MAX_ATTEMPTS) {
+          loginLocked = true;
+          errorEl.textContent = "Too many failed attempts. Locked for " + LOCKOUT_SECONDS + " seconds.";
+          errorEl.classList.add("visible");
+
+          var submitBtn = document.querySelector(".form-submit");
+          submitBtn.disabled = true;
+          submitBtn.style.opacity = "0.5";
+          submitBtn.style.cursor = "not-allowed";
+
+          var remaining = LOCKOUT_SECONDS;
+          var countdown = setInterval(function () {
+            remaining--;
+            submitBtn.textContent = "Locked (" + remaining + "s)";
+            if (remaining <= 0) {
+              clearInterval(countdown);
+              loginLocked = false;
+              loginAttempts = 0;
+              submitBtn.disabled = false;
+              submitBtn.style.opacity = "";
+              submitBtn.style.cursor = "";
+              submitBtn.textContent = "Sign In to Dashboard";
+              errorEl.classList.remove("visible");
+            }
+          }, 1000);
+        } else {
+          errorEl.textContent = "Invalid credentials. " + (MAX_ATTEMPTS - loginAttempts) + " attempts remaining.";
+          errorEl.classList.add("visible");
+        }
       }
     });
   </script>

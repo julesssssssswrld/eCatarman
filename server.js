@@ -58,8 +58,83 @@ function sendJSON(res, statusCode, data) {
   res.end(JSON.stringify(data));
 }
 
+// =====================================================================
+//  RATE LIMITER — In-memory, per-IP, per-route
+// =====================================================================
+const rateLimitStore = {};   // { "ip:route": { count, resetAt } }
+
+/**
+ * Check rate limit. Returns true if request is allowed, false if blocked.
+ * @param {string} ip     — client IP
+ * @param {string} route  — route key (e.g. "/api/email")
+ * @param {number} limit  — max requests per window
+ * @param {number} windowMs — window duration in ms
+ */
+function rateLimit(ip, route, limit, windowMs) {
+  const key = ip + ":" + route;
+  const now = Date.now();
+
+  if (!rateLimitStore[key] || now > rateLimitStore[key].resetAt) {
+    rateLimitStore[key] = { count: 1, resetAt: now + windowMs };
+    return { allowed: true, remaining: limit - 1 };
+  }
+
+  rateLimitStore[key].count++;
+
+  if (rateLimitStore[key].count > limit) {
+    const retryAfter = Math.ceil((rateLimitStore[key].resetAt - now) / 1000);
+    return { allowed: false, remaining: 0, retryAfter: retryAfter };
+  }
+
+  return { allowed: true, remaining: limit - rateLimitStore[key].count };
+}
+
+// Cleanup stale entries every 5 minutes
+setInterval(() => {
+  const now = Date.now();
+  for (const key in rateLimitStore) {
+    if (now > rateLimitStore[key].resetAt) delete rateLimitStore[key];
+  }
+}, 5 * 60 * 1000);
+
+// ── Helper: get client IP ────────────────────────────────────────────────
+function getClientIP(req) {
+  return req.headers["x-forwarded-for"]?.split(",")[0]?.trim() ||
+         req.socket.remoteAddress || "unknown";
+}
+
+// ── Helper: send 429 Too Many Requests ───────────────────────────────────
+function sendRateLimited(res, retryAfter) {
+  res.writeHead(429, {
+    "Content-Type": "application/json",
+    "Retry-After": String(retryAfter),
+    "Access-Control-Allow-Origin": "*",
+  });
+  res.end(JSON.stringify({
+    error: "Too many requests. Please try again in " + retryAfter + " seconds.",
+    retryAfter: retryAfter,
+  }));
+}
+
+// =====================================================================
+//  DUPLICATE SUBMISSION TRACKER
+// =====================================================================
+const recentSubmissions = {}; // { "citizenName:serviceId": timestamp }
+const DUPLICATE_WINDOW_MS = 60 * 1000; // 60 seconds
+
+function isDuplicateSubmission(citizenName, serviceId) {
+  const key = (citizenName || "").toLowerCase() + ":" + serviceId;
+  const now = Date.now();
+  if (recentSubmissions[key] && (now - recentSubmissions[key]) < DUPLICATE_WINDOW_MS) {
+    return true;
+  }
+  recentSubmissions[key] = now;
+  return false;
+}
+
 const server = http.createServer(async (req, res) => {
   const urlPath = req.url.split("?")[0];
+  const clientIP = getClientIP(req);
 
   // ── CORS preflight ───────────────────────────────────────────────────
   if (req.method === "OPTIONS") {
@@ -70,6 +145,37 @@ const server = http.createServer(async (req, res) => {
     });
     res.end();
     return;
+  }
+
+  // =====================================================================
+  //  RATE LIMIT — Apply to sensitive endpoints
+  // =====================================================================
+
+  // Login page & admin routes: 10 requests per 60 seconds
+  if (urlPath === "/admin" || urlPath === "/dashboard") {
+    const rl = rateLimit(clientIP, "admin", 10, 60 * 1000);
+    if (!rl.allowed) {
+      console.log(`🚫 Rate limited: ${clientIP} on ${urlPath}`);
+      return sendRateLimited(res, rl.retryAfter);
+    }
+  }
+
+  // Email endpoints: 5 emails per 60 seconds
+  if (urlPath.startsWith("/api/email/") && req.method === "POST") {
+    const rl = rateLimit(clientIP, "email", 5, 60 * 1000);
+    if (!rl.allowed) {
+      console.log(`🚫 Rate limited: ${clientIP} on email API`);
+      return sendRateLimited(res, rl.retryAfter);
+    }
+  }
+
+  // Request creation: 10 per 60 seconds
+  if (urlPath === "/api/requests" && req.method === "POST") {
+    const rl = rateLimit(clientIP, "requests-post", 10, 60 * 1000);
+    if (!rl.allowed) {
+      console.log(`🚫 Rate limited: ${clientIP} on request creation`);
+      return sendRateLimited(res, rl.retryAfter);
+    }
   }
 
   // =====================================================================
@@ -98,6 +204,16 @@ const server = http.createServer(async (req, res) => {
       if (!request.id || !request.serviceId) {
         return sendJSON(res, 400, { error: "Missing required fields" });
       }
+
+      // Duplicate submission check
+      if (isDuplicateSubmission(request.citizenName, request.serviceId)) {
+        console.log(`⚠️  Duplicate blocked: ${request.citizenName} — ${request.serviceName}`);
+        return sendJSON(res, 409, {
+          error: "duplicate",
+          message: "A similar request was already submitted. Please wait before submitting again.",
+        });
+      }
+
       const created = db.createRequest(request);
       console.log(`📝 New request: ${created.id} — ${created.serviceName}`);
       sendJSON(res, 201, created);

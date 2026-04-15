@@ -545,14 +545,37 @@ const eCatarman = (function () {
     // Add to cache immediately
     _requestCache.push(request);
 
-    // Persist to server (async fire-and-forget)
+    // Persist to server (async — check for duplicate/rate limit)
     fetch("/api/requests", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(request),
+    }).then(function (response) {
+      if (response.status === 409) {
+        // Duplicate — remove from local cache
+        _requestCache = _requestCache.filter(function (r) { return r.id !== request.id; });
+        response.json().then(function (data) {
+          _lastSubmitError = { type: "duplicate", message: data.message };
+          window.dispatchEvent(new CustomEvent("ecatarman:submit-error", { detail: _lastSubmitError }));
+        });
+      } else if (response.status === 429) {
+        _requestCache = _requestCache.filter(function (r) { return r.id !== request.id; });
+        response.json().then(function (data) {
+          _lastSubmitError = { type: "rate-limited", message: data.error };
+          window.dispatchEvent(new CustomEvent("ecatarman:submit-error", { detail: _lastSubmitError }));
+        });
+      }
     }).catch(function (e) { console.warn("Server save failed:", e.message); });
 
     return request;
+  }
+
+  var _lastSubmitError = null;
+
+  function getLastSubmitError() {
+    var err = _lastSubmitError;
+    _lastSubmitError = null;
+    return err;
   }
 
   function getRequestById(transactionId) {
@@ -899,6 +922,7 @@ const eCatarman = (function () {
     updateRequestStatus: updateRequestStatus,
     routeRequest: routeRequest,
     deleteRequest: deleteRequest,
+    getLastSubmitError: getLastSubmitError,
     getAnalytics: getAnalytics,
     login: login,
     logout: logout,

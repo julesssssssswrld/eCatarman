@@ -70,9 +70,19 @@ function renderNavigation() {
   footer.className = "site-footer";
   footer.innerHTML = `
     <div class="site-footer__inner">
-      <div class="site-footer__brand">
-        <span class="site-footer__logo">e<span>Catarman</span></span>
-        <p class="site-footer__tagline">Modular E-Governance Platform</p>
+      <div class="site-footer__top">
+        <div class="site-footer__brand">
+          <span class="site-footer__logo">e<span>Catarman</span></span>
+          <p class="site-footer__tagline">Modular E-Governance Platform</p>
+        </div>
+        <div class="site-footer__credits">
+          <p class="site-footer__credits-title">Proudly made with &lt;3 - Team Dell Though</p>
+          <p class="site-footer__credits-name">Jules Ian C. Tomacas</p>
+          <p class="site-footer__credits-name">Kent Jeanne S. De Leon</p>
+          <p class="site-footer__credits-name">Jose Manuel M. Cardeno</p>
+          <p class="site-footer__credits-name">Keniel Drew D. De Asis</p>
+          <p class="site-footer__credits-name">Jovan P. Atencio</p>
+        </div>
       </div>
       <div class="site-footer__links">
         <a href="/" class="site-footer__link">Home</a>

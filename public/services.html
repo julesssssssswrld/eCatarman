@@ -16,7 +16,7 @@
       <!-- Header -->
       <div class="services-header">
         <div class="services-header__content">
-          <div class="services-header__badge">Service Modules</div>
+          <div class="services-header__badge">SERVICES</div>
           <h1 class="services-header__title">LGU Services Portal</h1>
           <p class="services-header__desc">
             Six modular, integration-ready service departments. Apply online, track your request status, and download requirements — all from one centralized platform.
@@ -471,6 +471,41 @@
             }
           }
         });
+
+        // Listen for server-side rejection (duplicate / rate-limited)
+        window.addEventListener("ecatarman:submit-error", function (ev) {
+          var err = ev.detail;
+          body.innerHTML = "";
+          var warning = document.createElement("div");
+          warning.className = "modal__success";
+
+          var iconWrap = document.createElement("div");
+          iconWrap.className = "modal__success-icon";
+          iconWrap.style.background = "var(--amber-50)";
+          iconWrap.style.color = "#d97706";
+          iconWrap.appendChild(createIcon("alertTriangle", 32));
+
+          var title = document.createElement("h3");
+          title.style.color = "#92400e";
+          title.textContent = err.type === "duplicate" ? "Duplicate Submission Detected" : "Too Many Requests";
+
+          var p1 = document.createElement("p");
+          p1.textContent = err.message;
+
+          var p2 = document.createElement("p");
+          p2.style.cssText = "font-size:0.8125rem;color:var(--slate-400);font-weight:600;margin-top:0.75rem;";
+          p2.textContent = err.type === "duplicate"
+            ? "A similar request was already submitted within the last 60 seconds. Please wait before trying again."
+            : "You've exceeded the request limit. Please wait a moment and try again.";
+
+          warning.appendChild(iconWrap);
+          warning.appendChild(title);
+          warning.appendChild(p1);
+          warning.appendChild(p2);
+          body.appendChild(warning);
+
+          document.getElementById("modal-title").textContent = "Notice";
+        }, { once: true });
 
         body.appendChild(form);
         modalOverlay.classList.add("active");
