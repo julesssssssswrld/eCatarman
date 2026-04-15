@@ -584,7 +584,7 @@ const eCatarman = (function () {
 
   function getRequestsByDept(departmentId) {
     return _requestCache.filter(function (r) {
-      return r.departmentId === departmentId || r.routedTo.indexOf(departmentId) >= 0;
+      return r.departmentId === departmentId || (r.routedTo && r.routedTo.indexOf(departmentId) >= 0);
     });
   }
 
@@ -598,6 +598,7 @@ const eCatarman = (function () {
     _requestCache[idx].status = newStatus;
     _requestCache[idx].updatedAt = new Date().toISOString();
     if (note) {
+      if (!_requestCache[idx].notes) _requestCache[idx].notes = [];
       _requestCache[idx].notes.push({
         text: note,
         status: newStatus,
@@ -622,11 +623,13 @@ const eCatarman = (function () {
   function routeRequest(transactionId, targetDeptId, note) {
     const idx = _requestCache.findIndex(function (r) { return r.id === transactionId; });
     if (idx === -1) return null;
+    if (!_requestCache[idx].routedTo) _requestCache[idx].routedTo = [];
     if (_requestCache[idx].routedTo.indexOf(targetDeptId) === -1) {
       _requestCache[idx].routedTo.push(targetDeptId);
     }
     _requestCache[idx].updatedAt = new Date().toISOString();
     const dept = departments.find(function (d) { return d.id === targetDeptId; });
+    if (!_requestCache[idx].notes) _requestCache[idx].notes = [];
     _requestCache[idx].notes.push({
       text: note || "Routed to " + (dept ? dept.shortName : targetDeptId),
       status: _requestCache[idx].status,

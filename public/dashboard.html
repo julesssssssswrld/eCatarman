@@ -573,8 +573,9 @@
         var statusColor = eCatarman.STATUS_COLORS[r.status] || "blue";
         var dept = eCatarman.departments.find(function (d) { return d.id === r.departmentId; });
 
-        var hasAttachments = r.formData._attachments && r.formData._attachments.length > 0;
-        var attachBadge = hasAttachments ? ' <span title="Has ' + r.formData._attachments.length + ' attachment(s)" style="cursor:help;font-size:0.75rem;">📎</span>' : '';
+        var _fd = r.formData || {};
+        var hasAttachments = _fd._attachments && _fd._attachments.length > 0;
+        var attachBadge = hasAttachments ? ' <span title="Has ' + _fd._attachments.length + ' attachment(s)" style="cursor:help;font-size:0.75rem;">📎</span>' : '';
 
         var html = '<td class="admin-table__txn">' + r.id + '</td>';
         html += '<td>' + r.citizenName + attachBadge + '</td>';
@@ -582,7 +583,7 @@
         html += '<td>' + (dept ? dept.shortName : r.departmentId) + '</td>';
         html += '<td><span class="status-badge status-badge--' + statusColor + '">' + r.status + '</span></td>';
         if (showRouted) {
-          var routed = r.routedTo.map(function (rid) {
+          var routed = (r.routedTo || []).map(function (rid) {
             var rd = eCatarman.departments.find(function (d) { return d.id === rid; });
             return rd ? rd.shortName : rid;
           }).join(", ");
@@ -940,7 +941,7 @@
         // Application data
         html += '<p class="svc-module__sub-title">Application Data</p>';
         html += '<div class="track-result__details">';
-        Object.keys(r.formData).forEach(function (key) {
+        Object.keys(r.formData || {}).forEach(function (key) {
           if (key === "_attachments") return; // show separately
           var cleanLabel = getFieldLabel(r.serviceId, key);
           html += '<div class="track-detail"><div class="track-detail__label">' + cleanLabel + '</div><div class="track-detail__value">' + (r.formData[key] || "—") + '</div></div>';
@@ -948,10 +949,10 @@
         html += '</div>';
 
         // Attached documents (via UI module)
-        html += eCatarmanUI.renderAttachments(r.formData._attachments);
+        html += eCatarmanUI.renderAttachments((r.formData || {})._attachments);
 
         // Timeline
-        if (r.notes.length > 0) {
+        if (r.notes && r.notes.length > 0) {
           html += '<p class="svc-module__sub-title">Status Timeline</p>';
           html += '<div class="track-timeline">';
           r.notes.forEach(function (note) {
@@ -964,7 +965,7 @@
         }
 
         // Cross-department routing info
-        if (r.routedTo.length > 0) {
+        if (r.routedTo && r.routedTo.length > 0) {
           html += '<p class="svc-module__sub-title">Cross-Department Routing</p>';
           html += '<div class="svc-module__sub-list">';
           r.routedTo.forEach(function (did) {
