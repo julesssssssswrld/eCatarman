@@ -244,9 +244,49 @@
         });
       }
 
+      /** Populate a facility card's contacts section with numbers from a category */
+      function renderFacilityContacts(sectionId, contacts) {
+        var section = document.getElementById(sectionId);
+        if (!section) return;
+        var contactsWrap = section.querySelector(".facility-card__contacts");
+        if (!contactsWrap) return;
+
+        if (contacts.length === 0) {
+          // Leave the default "-" placeholder
+          return;
+        }
+
+        contactsWrap.innerHTML = "";
+        contacts.forEach(function (c) {
+          var item = document.createElement("div");
+          item.className = "facility-card__contact-item";
+          item.innerHTML = ''
+            + '<div class="facility-card__contact-icon"></div>'
+            + '<div>'
+            + '  <p class="facility-card__contact-label">' + c.label + '</p>'
+            + '  <a href="tel:' + c.number.replace(/\s/g, '') + '" class="facility-card__contact-num">' + c.number + '</a>'
+            + '</div>';
+          // Add phone icon
+          item.querySelector(".facility-card__contact-icon").appendChild(createIcon("phoneCall", 18, { filled: true }));
+          contactsWrap.appendChild(item);
+        });
+      }
+
       eCatarmanAPI.getEmergencyContacts()
         .then(function (data) {
-          renderBannerContacts(data.length ? data : fallbackContacts);
+          // Filter by category for each section
+          var mdrrmo = data.filter(function (c) { return c.category === "MDRRMO"; });
+          var hospital = data.filter(function (c) { return c.category === "Hospital"; });
+          var fire = data.filter(function (c) { return c.category === "Fire"; });
+          var police = data.filter(function (c) { return c.category === "Police"; });
+
+          // MDRRMO banner — only MDRRMO contacts
+          renderBannerContacts(mdrrmo.length ? mdrrmo : fallbackContacts);
+
+          // Facility sections — populate from their categories
+          renderFacilityContacts("section-hospital", hospital);
+          renderFacilityContacts("section-fire", fire);
+          renderFacilityContacts("section-police", police);
         })
         .catch(function () {
           renderBannerContacts(fallbackContacts);
