@@ -954,6 +954,21 @@ img {
   outline: none;
 }
 
+.emergency-header .quick-link {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.18);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 18px 30px -20px rgba(127, 29, 29, 0.9);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.emergency-header .quick-link:hover,
+.emergency-header .quick-link:focus-visible {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.28);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 18px 30px -18px rgba(127, 29, 29, 1);
+}
+
 .quick-link:hover,
 .quick-link:focus-visible {
   transform: scale(1.05);
@@ -969,12 +984,24 @@ img {
   border-color: var(--teal-100);
 }
 
+.emergency-header .quick-link.teal {
+  border-color: rgba(94, 234, 212, 0.28);
+}
+
 .quick-link.orange {
   border-color: var(--orange-100);
 }
 
+.emergency-header .quick-link.orange {
+  border-color: rgba(251, 191, 36, 0.26);
+}
+
 .quick-link.blue {
   border-color: var(--blue-100);
+}
+
+.emergency-header .quick-link.blue {
+  border-color: rgba(96, 165, 250, 0.28);
 }
 
 .quick-link__icon {
@@ -993,14 +1020,29 @@ img {
   color: var(--teal-600);
 }
 
+.emergency-header .quick-link__icon.teal {
+  background: rgba(255, 255, 255, 0.16);
+  color: #a7f3d0;
+}
+
 .quick-link__icon.orange {
   background: var(--orange-50);
   color: var(--orange-600);
 }
 
+.emergency-header .quick-link__icon.orange {
+  background: rgba(255, 255, 255, 0.16);
+  color: #fed7aa;
+}
+
 .quick-link__icon.blue {
   background: var(--blue-50);
   color: var(--blue-600);
+}
+
+.emergency-header .quick-link__icon.blue {
+  background: rgba(255, 255, 255, 0.16);
+  color: #bfdbfe;
 }
 
 .quick-link__title {
@@ -1010,10 +1052,18 @@ img {
   margin-bottom: 0.25rem;
 }
 
+.emergency-header .quick-link__title {
+  color: #fff;
+}
+
 .quick-link__desc {
   font-size: 0.875rem;
   color: var(--slate-500);
   font-weight: 500;
+}
+
+.emergency-header .quick-link__desc {
+  color: rgba(255, 255, 255, 0.82);
 }
 
 /* 911 Banner (inside MDRRMO header) */
