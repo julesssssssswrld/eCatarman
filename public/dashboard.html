@@ -254,6 +254,8 @@
 
   <script src="/js/icons.js"></script>
   <script src="/js/data.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/ui.js"></script>
   <script>
     // Auth check — runs on initial load
     if (!eCatarman.isLoggedIn()) {
@@ -310,44 +312,14 @@
       /* ================================================================
          ACTIVITY LOG (localStorage)
          ================================================================ */
-      var LOG_KEY = "ecatarman_activity_log";
-
-      function getActivityLog() {
-        try { return JSON.parse(localStorage.getItem(LOG_KEY)) || []; }
-        catch (e) { return []; }
-      }
-
-      function logActivity(action, txnId, details) {
-        var log = getActivityLog();
-        log.unshift({
-          action: action,
-          txnId: txnId || "",
-          details: details || "",
-          timestamp: new Date().toISOString(),
-        });
-        if (log.length > 100) log = log.slice(0, 100); // keep max 100
-        localStorage.setItem(LOG_KEY, JSON.stringify(log));
-      }
-
-      function clearActivityLog() {
-        localStorage.removeItem(LOG_KEY);
-      }
+      var getActivityLog = eCatarmanUI.getActivityLog;
+      var logActivity = eCatarmanUI.logActivity;
+      var clearActivityLog = eCatarmanUI.clearActivityLog;
 
       /* ================================================================
-         TOAST NOTIFICATIONS
+         TOAST NOTIFICATIONS — delegated to eCatarmanUI module
          ================================================================ */
-      var toastEl = document.getElementById("admin-toast");
-      var toastText = document.getElementById("toast-text");
-      var toastTimeout;
-
-      function showToast(message, type) {
-        clearTimeout(toastTimeout);
-        toastEl.className = "admin-toast admin-toast--" + (type || "success") + " admin-toast--visible";
-        toastText.textContent = message;
-        toastTimeout = setTimeout(function () {
-          toastEl.classList.remove("admin-toast--visible");
-        }, 3000);
-      }
+      var showToast = eCatarmanUI.showToast;
 
       /* ================================================================
          SIDEBAR ICONS
@@ -441,6 +413,11 @@
         e.preventDefault();
         showView("requests");
       });
+
+      /* ================================================================
+         HELPER: Send status email — delegated to eCatarmanAPI module
+         ================================================================ */
+      var sendStatusEmail = eCatarmanAPI.sendStatusEmail;
 
       /* ================================================================
          RENDER DASHBOARD
@@ -639,21 +616,7 @@
             logActivity("Status Update", quickBtn.dataset.txn, "→ " + next);
             showToast(quickBtn.dataset.txn + " advanced to " + next, "success");
 
-            // Email citizen
-            if (reqData && reqData.citizenEmail) {
-              fetch("/api/email/status", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  email: reqData.citizenEmail,
-                  citizenName: reqData.citizenName,
-                  serviceName: reqData.serviceName,
-                  newStatus: next,
-                  txnId: quickBtn.dataset.txn,
-                  note: "Quick advanced to " + next,
-                }),
-              }).catch(function () {});
-            }
+            sendStatusEmail(reqData, next, "Quick advanced to " + next);
 
             renderDashboard();
             renderAllRequests();
@@ -794,28 +757,17 @@
       ];
 
       function renderEmergencyContacts() {
-        // Fetch all contacts from API
-        var xhr = new XMLHttpRequest();
-        xhr.open("GET", "/api/emergency-contacts", true);
-        xhr.onload = function () {
-          if (xhr.status === 200) {
-            _emergencyContacts = JSON.parse(xhr.responseText);
-          } else {
-            _emergencyContacts = [];
-          }
-          renderCategoryTabs();
-          // Auto-select first category or keep current
-          if (_ecActiveCategory) {
-            selectCategory(_ecActiveCategory);
-          } else {
-            document.getElementById("ec-category-content").style.display = "none";
-          }
-        };
-        xhr.onerror = function () {
-          _emergencyContacts = [];
-          renderCategoryTabs();
-        };
-        xhr.send();
+        eCatarmanAPI.getEmergencyContacts()
+          .then(function (data) { _emergencyContacts = data; })
+          .catch(function () { _emergencyContacts = []; })
+          .then(function () {
+            renderCategoryTabs();
+            if (_ecActiveCategory) {
+              selectCategory(_ecActiveCategory);
+            } else {
+              document.getElementById("ec-category-content").style.display = "none";
+            }
+          });
       }
 
       function renderCategoryTabs() {
@@ -926,21 +878,14 @@
           return;
         }
 
-        var xhr = new XMLHttpRequest();
-        xhr.open("PUT", "/api/emergency-contacts", true);
-        xhr.setRequestHeader("Content-Type", "application/json");
-        xhr.onload = function () {
-          if (xhr.status === 200) {
+        eCatarmanAPI.updateEmergencyContacts(_emergencyContacts)
+          .then(function () {
             showToast("Emergency contacts saved!", "success");
             renderCategoryTabs();
-          } else {
+          })
+          .catch(function () {
             showToast("Failed to save contacts", "error");
-          }
-        };
-        xhr.onerror = function () {
-          showToast("Network error saving contacts", "error");
-        };
-        xhr.send(JSON.stringify(_emergencyContacts));
+          });
       });
 
       function getFieldLabel(serviceId, fieldName) {
@@ -999,24 +944,8 @@
         });
         html += '</div>';
 
-        // Attached documents
-        if (r.formData._attachments && r.formData._attachments.length > 0) {
-          html += '<p class="svc-module__sub-title">📎 Attached Documents</p>';
-          html += '<div style="display:flex;flex-direction:column;gap:0.5rem;margin-bottom:1rem;">';
-          r.formData._attachments.forEach(function (file) {
-            var icon = file.type === "application/pdf" ? "📄" : (file.type && file.type.startsWith("image/") ? "🖼️" : "📎");
-            var sizeMB = (file.size / (1024 * 1024)).toFixed(2);
-            html += '<a href="' + file.url + '" target="_blank" style="display:flex;align-items:center;gap:0.75rem;padding:0.625rem 1rem;background:var(--slate-50);border:1px solid var(--slate-200);border-radius:0.75rem;text-decoration:none;transition:all 0.2s;">'
-              + '<span style="font-size:1.25rem;">' + icon + '</span>'
-              + '<div style="flex:1;min-width:0;">'
-              + '<p style="font-weight:700;font-size:0.8125rem;color:var(--slate-700);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:0;">' + file.originalName + '</p>'
-              + '<p style="font-size:0.6875rem;color:var(--slate-400);margin:0;">' + sizeMB + ' MB</p>'
-              + '</div>'
-              + '<span style="font-size:0.75rem;font-weight:700;color:var(--teal-600);">View ↗</span>'
-              + '</a>';
-          });
-          html += '</div>';
-        }
+        // Attached documents (via UI module)
+        html += eCatarmanUI.renderAttachments(r.formData._attachments);
 
         // Timeline
         if (r.notes.length > 0) {
@@ -1079,7 +1008,6 @@
             html += '</div>';
           }
 
-
           // Route to department
           html += '<p class="svc-module__sub-title">Route to Department</p>';
           html += '<div class="admin-route-row">';
@@ -1127,21 +1055,7 @@
             logActivity("Status Update", txn, r.citizenName + " → " + newStatus);
             showToast("Status updated to " + newStatus, "success");
 
-            // Email citizen
-            if (r.citizenEmail) {
-              fetch("/api/email/status", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  email: r.citizenEmail,
-                  citizenName: r.citizenName,
-                  serviceName: r.serviceName,
-                  newStatus: newStatus,
-                  txnId: txn,
-                  note: "Status updated to " + newStatus,
-                }),
-              }).catch(function () {});
-            }
+            sendStatusEmail(r, newStatus);
 
             openDetailModal(txn);
             renderDashboard();
@@ -1181,21 +1095,7 @@
             logActivity("Declined", txn, r.citizenName + " — " + reason);
             showToast("Request declined", "info");
 
-            // Send rejection email with reason
-            if (r.citizenEmail) {
-              fetch("/api/email/status", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  email: r.citizenEmail,
-                  citizenName: r.citizenName,
-                  serviceName: r.serviceName,
-                  newStatus: "Rejected",
-                  txnId: txn,
-                  note: "Your request has been declined.\n\nReason: " + reason + "\n\nIf you believe this is an error, please contact the relevant department or submit a new request with the correct information.",
-                }),
-              }).catch(function () {});
-            }
+            sendStatusEmail(r, "Rejected", "Your request has been declined.\n\nReason: " + reason + "\n\nIf you believe this is an error, please contact the relevant department or submit a new request with the correct information.");
 
             openDetailModal(txn);
             renderDashboard();
@@ -1216,18 +1116,14 @@
 
               // Email citizen
               if (r.citizenEmail) {
-                fetch("/api/email/route", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({
-                    email: r.citizenEmail,
-                    citizenName: r.citizenName,
-                    serviceName: r.serviceName,
-                    fromDept: fromDept ? fromDept.name : r.departmentId,
-                    toDept: targetDept ? targetDept.name : selectEl.value,
-                    txnId: routeBtn.dataset.txn,
-                  }),
-                }).catch(function () {});
+                eCatarmanAPI.sendRouteEmail({
+                  email: r.citizenEmail,
+                  citizenName: r.citizenName,
+                  serviceName: r.serviceName,
+                  fromDept: fromDept ? fromDept.name : r.departmentId,
+                  toDept: targetDept ? targetDept.name : selectEl.value,
+                  txnId: routeBtn.dataset.txn,
+                });
               }
 
               openDetailModal(routeBtn.dataset.txn);

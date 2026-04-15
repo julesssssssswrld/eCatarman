@@ -213,6 +213,7 @@
 
   <script src="/js/icons.js"></script>
   <script src="/js/data.js"></script>
+  <script src="/js/api.js"></script>
   <script src="/js/navigation.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -222,17 +223,12 @@
 
       // Load emergency contacts from API
       var bannerNumbers = document.getElementById("banner-numbers");
-      var xhr = new XMLHttpRequest();
-      xhr.open("GET", "/api/emergency-contacts", true);
-      xhr.onload = function () {
-        var contacts = [];
-        try { contacts = JSON.parse(xhr.responseText); } catch (e) {}
-        if (!contacts.length) {
-          contacts = [
-            { label: "Smart", number: "0949 151 3810" },
-            { label: "Globe", number: "0905 547 7522" },
-          ];
-        }
+      var fallbackContacts = [
+        { label: "Smart", number: "0949 151 3810" },
+        { label: "Globe", number: "0905 547 7522" },
+      ];
+
+      function renderBannerContacts(contacts) {
         bannerNumbers.innerHTML = "";
         contacts.forEach(function (c, i) {
           if (i > 0) {
@@ -246,11 +242,15 @@
             + '<a href="tel:' + c.number.replace(/\s/g, '') + '" class="banner-numbers__num">' + c.number + '</a>';
           bannerNumbers.appendChild(item);
         });
-      };
-      xhr.onerror = function () {
-        bannerNumbers.innerHTML = '<div class="banner-numbers__item"><span class="banner-numbers__label">Smart</span><span class="banner-numbers__num">0949 151 3810</span></div><div class="banner-numbers__divider"></div><div class="banner-numbers__item"><span class="banner-numbers__label">Globe</span><span class="banner-numbers__num">0905 547 7522</span></div>';
-      };
-      xhr.send();
+      }
+
+      eCatarmanAPI.getEmergencyContacts()
+        .then(function (data) {
+          renderBannerContacts(data.length ? data : fallbackContacts);
+        })
+        .catch(function () {
+          renderBannerContacts(fallbackContacts);
+        });
 
       // Quick link icons
       document.getElementById("icon-ambulance").appendChild(createIcon("ambulance", 28));
