@@ -225,10 +225,19 @@
   <script src="/js/icons.js"></script>
   <script src="/js/data.js"></script>
   <script>
-    // Auth check
+    // Auth check — runs on initial load
     if (!eCatarman.isLoggedIn()) {
-      window.location.href = "/admin";
+      window.location.replace("/admin");
     }
+
+    // Also check on back/forward button (browser serves cached page)
+    window.addEventListener("pageshow", function (event) {
+      if (event.persisted || performance.getEntriesByType("navigation")[0].type === "back_forward") {
+        if (!eCatarman.isLoggedIn()) {
+          window.location.replace("/admin");
+        }
+      }
+    });
 
     document.addEventListener("DOMContentLoaded", function () {
 
@@ -291,7 +300,8 @@
          ================================================================ */
       document.getElementById("logout-btn").addEventListener("click", function () {
         eCatarman.logout();
-        window.location.href = "/admin";
+        // Replace history so back button won't return to dashboard after logout
+        window.location.replace("/admin");
       });
 
       /* ================================================================
