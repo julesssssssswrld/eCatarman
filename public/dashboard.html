@@ -14,7 +14,7 @@
   <!-- Sidebar -->
   <aside class="admin-sidebar" id="admin-sidebar">
     <div class="admin-sidebar__header">
-      <a href="/" class="admin-sidebar__logo">e<span>Catarman</span></a>
+      <a class="admin-sidebar__logo">e<span>Catarman</span></a>
       <span class="admin-sidebar__badge">Admin</span>
     </div>
 
@@ -695,6 +695,17 @@
         showToast("Activity log cleared", "info");
       });
 
+      function getFieldLabel(serviceId, fieldName) {
+        var svc = eCatarman.services.find(function(s) { return s.id === serviceId; });
+        if (svc) {
+          var field = svc.fields.find(function(f) { return f.name === fieldName; });
+          if (field) return field.label;
+        }
+        // Fallback: insert space before capital letters and capitalize first letter
+        var formatted = fieldName.replace(/([A-Z])/g, ' $1');
+        return formatted.charAt(0).toUpperCase() + formatted.slice(1);
+      }
+
       /* ================================================================
          REQUEST DETAIL MODAL
          ================================================================ */
@@ -734,7 +745,8 @@
         html += '<p class="svc-module__sub-title">Application Data</p>';
         html += '<div class="track-result__details">';
         Object.keys(r.formData).forEach(function (key) {
-          html += '<div class="track-detail"><div class="track-detail__label">' + key + '</div><div class="track-detail__value">' + (r.formData[key] || "—") + '</div></div>';
+          var cleanLabel = getFieldLabel(r.serviceId, key);
+          html += '<div class="track-detail"><div class="track-detail__label">' + cleanLabel + '</div><div class="track-detail__value">' + (r.formData[key] || "—") + '</div></div>';
         });
         html += '</div>';
 
@@ -972,7 +984,8 @@
 
         Object.keys(r.formData).forEach(function (key) {
           if (r.formData[key]) {
-            receiptHtml += '<div class="row"><span class="label">' + key + '</span><span class="value">' + r.formData[key] + '</span></div>';
+            var cleanLabel = getFieldLabel(r.serviceId, key);
+            receiptHtml += '<div class="row"><span class="label">' + cleanLabel + '</span><span class="value">' + r.formData[key] + '</span></div>';
           }
         });
 
