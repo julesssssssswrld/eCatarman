@@ -38,6 +38,11 @@
                 <h3 class="quick-link__title">Fire Department</h3>
                 <p class="quick-link__desc">BFP Catarman Station</p>
               </div>
+              <div class="quick-link blue" id="quick-link-police" tabindex="0" role="button" aria-label="Scroll to Police Station section">
+                <div class="quick-link__icon blue" id="icon-shield"></div>
+                <h3 class="quick-link__title">Police Station</h3>
+                <p class="quick-link__desc">PNP Catarman Municipal</p>
+              </div>
             </div>
 
             <!-- 911 Banner -->
@@ -54,17 +59,12 @@
             <div class="banner-numbers">
               <div class="banner-numbers__item">
                 <span class="banner-numbers__label">Smart</span>
-                <span class="banner-numbers__num">-</span>
+                <span class="banner-numbers__num">0949 151 3810</span>
               </div>
               <div class="banner-numbers__divider"></div>
               <div class="banner-numbers__item">
                 <span class="banner-numbers__label">Globe</span>
-                <span class="banner-numbers__num">-</span>
-              </div>
-              <div class="banner-numbers__divider"></div>
-              <div class="banner-numbers__item">
-                <span class="banner-numbers__label">Landline</span>
-                <span class="banner-numbers__num">-</span>
+                <span class="banner-numbers__num">0905 547 7522</span>
               </div>
             </div>
           </div>
@@ -106,13 +106,6 @@
                 <p class="facility-card__address">Catarman, Northern Samar</p>
               </div>
               <div class="facility-card__contacts">
-                <div class="facility-card__contact-item">
-                  <div class="facility-card__contact-icon" id="icon-phone-hosp-1"></div>
-                  <div>
-                    <p class="facility-card__contact-label">Emergency Room</p>
-                    <p class="facility-card__contact-num">-</p>
-                  </div>
-                </div>
                 <div class="facility-card__contact-item">
                   <div class="facility-card__contact-icon" id="icon-phone-hosp-2"></div>
                   <div>
@@ -161,14 +154,54 @@
               </div>
               <div class="facility-card__contacts">
                 <div class="facility-card__contact-item">
-                  <div class="facility-card__contact-icon" id="icon-phone-fire-1"></div>
+                  <div class="facility-card__contact-icon" id="icon-phone-fire-2"></div>
                   <div>
-                    <p class="facility-card__contact-label">Emergency</p>
+                    <p class="facility-card__contact-label">Office</p>
                     <p class="facility-card__contact-num">-</p>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Police Station Detail Section -->
+      <section class="facility-section" id="section-police">
+        <div class="facility-section__header">
+          <div>
+            <h2 class="facility-section__title">
+              <span class="facility-section__title-bar blue"></span>
+              Police Station
+            </h2>
+            <p class="facility-section__desc">
+              Philippine National Police — Catarman Municipal Police Station.
+            </p>
+          </div>
+        </div>
+
+        <div class="facility-grid">
+          <!-- Police Card -->
+          <div class="facility-card">
+            <div class="facility-card__map-wrap">
+              <iframe
+                class="facility-card__map"
+                src="https://www.google.com/maps?q=12.499396144583134,124.6375046886719&z=17&output=embed"
+                allowfullscreen=""
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+                title="PNP Catarman Municipal Police Station Map">
+              </iframe>
+            </div>
+            <div class="facility-card__info">
+              <div class="facility-card__icon-wrap blue" id="icon-police-card"></div>
+              <div>
+                <h3 class="facility-card__name">PNP Catarman Municipal Police Station</h3>
+                <p class="facility-card__address">Catarman, Northern Samar</p>
+              </div>
+              <div class="facility-card__contacts">
                 <div class="facility-card__contact-item">
-                  <div class="facility-card__contact-icon" id="icon-phone-fire-2"></div>
+                  <div class="facility-card__contact-icon" id="icon-phone-police-2"></div>
                   <div>
                     <p class="facility-card__contact-label">Office</p>
                     <p class="facility-card__contact-num">-</p>
@@ -198,13 +231,16 @@
 
       // Hospital card icons
       document.getElementById("icon-hospital-card").appendChild(createIcon("ambulance", 24));
-      document.getElementById("icon-phone-hosp-1").appendChild(createIcon("phoneCall", 18, { filled: true }));
       document.getElementById("icon-phone-hosp-2").appendChild(createIcon("phoneCall", 18, { filled: true }));
 
       // Fire card icons
       document.getElementById("icon-fire-card").appendChild(createIcon("flame", 24));
-      document.getElementById("icon-phone-fire-1").appendChild(createIcon("phoneCall", 18, { filled: true }));
       document.getElementById("icon-phone-fire-2").appendChild(createIcon("phoneCall", 18, { filled: true }));
+
+      // Police quick-link + card icons
+      document.getElementById("icon-shield").appendChild(createIcon("shield", 28));
+      document.getElementById("icon-police-card").appendChild(createIcon("shield", 24));
+      document.getElementById("icon-phone-police-2").appendChild(createIcon("phoneCall", 18, { filled: true }));
 
       // Scroll-to-section handlers
       document.getElementById("quick-link-hospital").addEventListener("click", function () {
@@ -224,6 +260,17 @@
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
           document.getElementById("section-fire").scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      });
+
+      // Police scroll handlers
+      document.getElementById("quick-link-police").addEventListener("click", function () {
+        document.getElementById("section-police").scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+      document.getElementById("quick-link-police").addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          document.getElementById("section-police").scrollIntoView({ behavior: "smooth", block: "start" });
         }
       });
     });

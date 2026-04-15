@@ -960,6 +960,9 @@ img {
 .quick-link.orange {
   border-color: var(--orange-100);
 }
+.quick-link.blue {
+  border-color: var(--blue-100);
+}
 
 .quick-link__icon {
   width: 3.5rem;
@@ -979,6 +982,10 @@ img {
 .quick-link__icon.orange {
   background: var(--orange-50);
   color: var(--orange-600);
+}
+.quick-link__icon.blue {
+  background: var(--blue-50);
+  color: var(--blue-600);
 }
 
 .quick-link__title {
@@ -1171,6 +1178,9 @@ img {
 .facility-section__title-bar.orange {
   background: var(--orange-600);
 }
+.facility-section__title-bar.blue {
+  background: var(--blue-600);
+}
 
 .facility-section__desc {
   color: var(--slate-500);
@@ -1246,6 +1256,10 @@ img {
 .facility-card__icon-wrap.orange {
   background: var(--orange-50);
   color: var(--orange-600);
+}
+.facility-card__icon-wrap.blue {
+  background: var(--blue-50);
+  color: var(--blue-600);
 }
 
 .facility-card__name {
