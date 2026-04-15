@@ -573,8 +573,11 @@
         var statusColor = eCatarman.STATUS_COLORS[r.status] || "blue";
         var dept = eCatarman.departments.find(function (d) { return d.id === r.departmentId; });
 
+        var hasAttachments = r.formData._attachments && r.formData._attachments.length > 0;
+        var attachBadge = hasAttachments ? ' <span title="Has ' + r.formData._attachments.length + ' attachment(s)" style="cursor:help;font-size:0.75rem;">📎</span>' : '';
+
         var html = '<td class="admin-table__txn">' + r.id + '</td>';
-        html += '<td>' + r.citizenName + '</td>';
+        html += '<td>' + r.citizenName + attachBadge + '</td>';
         html += '<td>' + r.serviceName + '</td>';
         html += '<td>' + (dept ? dept.shortName : r.departmentId) + '</td>';
         html += '<td><span class="status-badge status-badge--' + statusColor + '">' + r.status + '</span></td>';

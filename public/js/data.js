@@ -686,7 +686,7 @@ const eCatarman = (function () {
         departmentId: "bplo",
         departmentName: "Business Permit & Licensing Office",
         status: STATUS.PROCESSING,
-        formData: { serviceType: "New Business Permit", modeOfPayment: "Annual", ownerName: "Maria Santos", email: "maria@email.com", sex: "Female", contactNumber: "09171234567", tinNo: "123-456-789-000", ownerAddress: "Brgy. Dalakit, Catarman", businessName: "Catarman General Store", businessAddress: "National Highway, Brgy. Dalakit, Catarman", barangay: "Dalakit", businessType: "Retail / Sari-Sari Store", dtiSecNo: "DTI-08-2025-00412", capitalInvestment: "250000", lastYearGross: "0", floorArea: "48" },
+        formData: { serviceType: "New Business Permit", modeOfPayment: "Annual", ownerName: "Maria Santos", email: "maria@email.com", sex: "Female", contactNumber: "09171234567", tinNo: "123-456-789-000", ownerAddress: "Brgy. Dalakit, Catarman", businessName: "Catarman General Store", businessAddress: "National Highway, Brgy. Dalakit, Catarman", barangay: "Dalakit", businessType: "Retail / Sari-Sari Store", dtiSecNo: "DTI-08-2025-00412", capitalInvestment: "250000", lastYearGross: "0", floorArea: "48", _attachments: [{ originalName: "DTI_Certificate.pdf", url: "#", size: 245760, type: "application/pdf" }, { originalName: "Valid_ID_Front.jpg", url: "#", size: 1048576, type: "image/jpeg" }] },
         citizenName: "Maria Santos",
         citizenEmail: "maria@email.com",
         submittedAt: "2026-04-10T08:30:00.000Z",
