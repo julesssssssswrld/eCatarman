@@ -242,6 +242,15 @@
         form.id = "apply-form";
 
         svc.fields.forEach(function (field) {
+          // Section headers — visual grouping only
+          if (field.type === "section") {
+            var sectionDiv = document.createElement("div");
+            sectionDiv.className = "form-section-header";
+            sectionDiv.textContent = field.label;
+            form.appendChild(sectionDiv);
+            return;
+          }
+
           var group = document.createElement("div");
           group.className = "form-group";
 
@@ -294,6 +303,7 @@
           ev.preventDefault();
           var formData = {};
           svc.fields.forEach(function (field) {
+            if (field.type === "section") return; // skip section headers
             var el = form.querySelector("[name='" + field.name + "']");
             formData[field.name] = el ? el.value : "";
           });
