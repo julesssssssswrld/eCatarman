@@ -1,0 +1,183 @@
+  <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Services | Catarman Web Portal</title>
+  <meta name="description" content="Catarman LGU Services Portal — Browse and avail municipal services">
+  <link rel="icon" href="/favicon.ico">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+  <main class="main-content">
+    <div class="services-sections">
+
+      <!-- Header -->
+      <div class="services-header">
+        <div class="services-header__content">
+          <div class="services-header__badge">Service Directory</div>
+          <h1 class="services-header__title">LGU Services Portal</h1>
+          <p class="services-header__desc">
+            Browse and avail of our digitized municipal services. Choose to apply online, download requirements, or book an appointment for faster processing at the municipal hall.
+          </p>
+
+        </div>
+      </div>
+
+      <!-- Content Grid -->
+      <div class="services-content">
+
+        <!-- Main column -->
+        <div class="services-main">
+
+          <!-- Primary e-Services -->
+          <section>
+            <div class="section-title-bar">
+              <span class="section-title-bar__bar teal"></span>
+              <h2 class="section-title-bar__text">Primary e-Services</h2>
+            </div>
+            <div class="primary-services-grid">
+              <div class="service-hero-card">
+                <div class="service-hero-card__tag">Online</div>
+                <div class="service-hero-card__icon" id="icon-biz-permit"></div>
+                <h3 class="service-hero-card__title">Business Permit</h3>
+              </div>
+              <div class="service-hero-card">
+                <div class="service-hero-card__tag">Online</div>
+                <div class="service-hero-card__icon" id="icon-property-tax"></div>
+                <h3 class="service-hero-card__title">Real Property Tax</h3>
+              </div>
+              <div class="service-hero-card">
+                <div class="service-hero-card__tag">Online Form</div>
+                <div class="service-hero-card__icon" id="icon-civil-reg"></div>
+                <h3 class="service-hero-card__title">Civil Registry</h3>
+              </div>
+            </div>
+          </section>
+
+          <!-- Assistance & Grants -->
+          <section>
+            <div class="section-title-bar">
+              <span class="section-title-bar__bar amber"></span>
+              <h2 class="section-title-bar__text">Assistance &amp; Grants</h2>
+            </div>
+            <div class="assistance-grid">
+              <div class="featured-card">
+                <div class="featured-card__icon rose" id="icon-medical"></div>
+                <div>
+                  <h4 class="featured-card__title">Medical Assistance</h4>
+                  <p class="featured-card__desc">Financial aid for hospitalization and medicines.</p>
+                </div>
+              </div>
+              <div class="featured-card">
+                <div class="featured-card__icon indigo" id="icon-scholarship"></div>
+                <div>
+                  <h4 class="featured-card__title">Scholarship Program</h4>
+                  <p class="featured-card__desc">Educational grants for deserving college students.</p>
+                </div>
+              </div>
+              <div class="featured-card">
+                <div class="featured-card__icon emerald" id="icon-livelihood"></div>
+                <div>
+                  <h4 class="featured-card__title">Livelihood Training</h4>
+                  <p class="featured-card__desc">Skills development and loans for local MSMEs.</p>
+                </div>
+              </div>
+              <div class="featured-card">
+                <div class="featured-card__icon blue" id="icon-transport"></div>
+                <div>
+                  <h4 class="featured-card__title">Transport &amp; Rescue</h4>
+                  <p class="featured-card__desc">LGU vehicles for emergency community deployment.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+        </div>
+
+        <!-- Sidebar -->
+        <div class="services-sidebar">
+
+          <!-- Guidance card -->
+          <div class="guidance-card">
+            <div class="guidance-card__bg"></div>
+            <div class="guidance-card__content">
+              <h3 class="guidance-card__title">Need guidance?</h3>
+              <p class="guidance-card__desc">Read our step-by-step citizen guides on how to avail municipal services properly.</p>
+              <button class="guidance-card__btn">Citizen's Charter</button>
+            </div>
+          </div>
+
+          <!-- Category list -->
+          <div class="category-card">
+            <h3 class="category-card__title">Service Categories</h3>
+            <div class="category-list">
+              <div class="category-item">
+                <span class="category-item__text">Health &amp; Nutrition</span>
+                <span class="category-item__arrow" id="cat-arrow-1"></span>
+              </div>
+              <div class="category-item">
+                <span class="category-item__text">Social Services</span>
+                <span class="category-item__arrow" id="cat-arrow-2"></span>
+              </div>
+              <div class="category-item">
+                <span class="category-item__text">Engineering &amp; Infrastructure</span>
+                <span class="category-item__arrow" id="cat-arrow-3"></span>
+              </div>
+              <div class="category-item">
+                <span class="category-item__text">Agricultural Support</span>
+                <span class="category-item__arrow" id="cat-arrow-4"></span>
+              </div>
+              <div class="category-item">
+                <span class="category-item__text">Legal Matters</span>
+                <span class="category-item__arrow" id="cat-arrow-5"></span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <script src="/js/icons.js"></script>
+  <script src="/js/navigation.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      // Search icon
+      const searchWrap = document.getElementById("search-icon-wrap");
+      if (searchWrap) {
+        const searchIcon = createIcon("search", 24);
+        searchWrap.prepend(searchIcon);
+      }
+
+      // Filter button icon
+      const filterBtn = document.getElementById("filter-btn");
+      if (filterBtn) {
+        const filterIcon = createIcon("filter", 20);
+        filterBtn.prepend(filterIcon);
+      }
+
+      // Primary e-Services icons
+      document.getElementById("icon-biz-permit").appendChild(createIcon("fileText", 28));
+      document.getElementById("icon-property-tax").appendChild(createIcon("home", 28));
+      document.getElementById("icon-civil-reg").appendChild(createIcon("fileBadge", 28));
+
+      // Assistance icons
+      document.getElementById("icon-medical").appendChild(createIcon("heart", 24));
+      document.getElementById("icon-scholarship").appendChild(createIcon("graduationCap", 24));
+      document.getElementById("icon-livelihood").appendChild(createIcon("briefcase", 24));
+      document.getElementById("icon-transport").appendChild(createIcon("bus", 24));
+
+      // Category arrows
+      for (let i = 1; i <= 5; i++) {
+        document.getElementById("cat-arrow-" + i).appendChild(createIcon("arrowRight", 18));
+      }
+    });
+  </script>
+
+</body>
+</html>

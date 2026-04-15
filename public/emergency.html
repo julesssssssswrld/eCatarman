@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Emergency | Catarman Web Portal</title>
+  <meta name="description" content="Catarman MDRRMO Emergency Hotlines — 24/7 Response">
+  <link rel="icon" href="/favicon.ico">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+  <main class="main-content">
+    <div class="emergency-sections">
+
+      <!-- Header -->
+      <div class="emergency-header">
+        <div class="emergency-header__inner">
+
+          <div class="emergency-header__main">
+            <div class="emergency-header__badge">
+              <span class="emergency-header__pulse"></span> Live 24/7 Response
+            </div>
+            <h1 class="emergency-header__title">MDRRMO Emergency</h1>
+            <p class="emergency-header__desc">
+              Immediate connection to Catarman's central emergency communications and dispatch center for police, fire, and medical teams.
+            </p>
+
+            <!-- Quick Links (Hospital & Fire) -->
+            <div class="quick-links quick-links--inline">
+              <div class="quick-link teal" id="quick-link-hospital" tabindex="0" role="button" aria-label="Scroll to Hospital section">
+                <div class="quick-link__icon teal" id="icon-ambulance"></div>
+                <h3 class="quick-link__title">Hospitals</h3>
+                <p class="quick-link__desc">Find nearest medical centers</p>
+              </div>
+              <div class="quick-link orange" id="quick-link-fire" tabindex="0" role="button" aria-label="Scroll to Fire Department section">
+                <div class="quick-link__icon orange" id="icon-flame"></div>
+                <h3 class="quick-link__title">Fire Department</h3>
+                <p class="quick-link__desc">BFP Catarman Station</p>
+              </div>
+            </div>
+
+            <!-- 911 Banner -->
+            <div class="banner-911" id="banner-911">
+              <div class="banner-911__icon-wrap" id="icon-phone-911"></div>
+              <div class="banner-911__content">
+                <p class="banner-911__label">National Emergency Hotline</p>
+                <p class="banner-911__number">911</p>
+              </div>
+              <a href="tel:911" class="banner-911__btn">Call Now</a>
+            </div>
+
+            <!-- Emergency Numbers at bottom of banner -->
+            <div class="banner-numbers">
+              <div class="banner-numbers__item">
+                <span class="banner-numbers__label">Smart</span>
+                <span class="banner-numbers__num">-</span>
+              </div>
+              <div class="banner-numbers__divider"></div>
+              <div class="banner-numbers__item">
+                <span class="banner-numbers__label">Globe</span>
+                <span class="banner-numbers__num">-</span>
+              </div>
+              <div class="banner-numbers__divider"></div>
+              <div class="banner-numbers__item">
+                <span class="banner-numbers__label">Landline</span>
+                <span class="banner-numbers__num">-</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Hospital Detail Section -->
+      <section class="facility-section" id="section-hospital">
+        <div class="facility-section__header">
+          <div>
+            <h2 class="facility-section__title">
+              <span class="facility-section__title-bar teal"></span>
+              Hospitals & Medical Centers
+            </h2>
+            <p class="facility-section__desc">
+              Nearest hospitals and emergency medical facilities in Catarman, Northern Samar.
+            </p>
+          </div>
+        </div>
+
+        <div class="facility-grid">
+          <!-- Hospital Card -->
+          <div class="facility-card">
+            <div class="facility-card__map-wrap">
+              <iframe
+                class="facility-card__map"
+                src="https://www.google.com/maps?q=12.500367485497243,124.63654765074257&z=17&output=embed"
+                allowfullscreen=""
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+                title="Catarman District Hospital Map">
+              </iframe>
+            </div>
+            <div class="facility-card__info">
+              <div class="facility-card__icon-wrap teal" id="icon-hospital-card"></div>
+              <div>
+                <h3 class="facility-card__name">Catarman District Hospital</h3>
+                <p class="facility-card__address">Catarman, Northern Samar</p>
+              </div>
+              <div class="facility-card__contacts">
+                <div class="facility-card__contact-item">
+                  <div class="facility-card__contact-icon" id="icon-phone-hosp-1"></div>
+                  <div>
+                    <p class="facility-card__contact-label">Emergency Room</p>
+                    <p class="facility-card__contact-num">-</p>
+                  </div>
+                </div>
+                <div class="facility-card__contact-item">
+                  <div class="facility-card__contact-icon" id="icon-phone-hosp-2"></div>
+                  <div>
+                    <p class="facility-card__contact-label">Main Line</p>
+                    <p class="facility-card__contact-num">-</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Fire Department Detail Section -->
+      <section class="facility-section" id="section-fire">
+        <div class="facility-section__header">
+          <div>
+            <h2 class="facility-section__title">
+              <span class="facility-section__title-bar orange"></span>
+              Fire Department
+            </h2>
+            <p class="facility-section__desc">
+              Bureau of Fire Protection — Catarman Fire Station.
+            </p>
+          </div>
+        </div>
+
+        <div class="facility-grid">
+          <!-- Fire Station Card -->
+          <div class="facility-card">
+            <div class="facility-card__map-wrap">
+              <iframe
+                class="facility-card__map"
+                src="https://www.google.com/maps?q=12.499636240081738,124.63758549497713&z=17&output=embed"
+                allowfullscreen=""
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+                title="BFP Catarman Fire Station Map">
+              </iframe>
+            </div>
+            <div class="facility-card__info">
+              <div class="facility-card__icon-wrap orange" id="icon-fire-card"></div>
+              <div>
+                <h3 class="facility-card__name">BFP Catarman Fire Station</h3>
+                <p class="facility-card__address">Catarman, Northern Samar</p>
+              </div>
+              <div class="facility-card__contacts">
+                <div class="facility-card__contact-item">
+                  <div class="facility-card__contact-icon" id="icon-phone-fire-1"></div>
+                  <div>
+                    <p class="facility-card__contact-label">Emergency</p>
+                    <p class="facility-card__contact-num">-</p>
+                  </div>
+                </div>
+                <div class="facility-card__contact-item">
+                  <div class="facility-card__contact-icon" id="icon-phone-fire-2"></div>
+                  <div>
+                    <p class="facility-card__contact-label">Office</p>
+                    <p class="facility-card__contact-num">-</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <script src="/js/icons.js"></script>
+  <script src="/js/navigation.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      // 911 banner phone icon
+      const p911 = createIcon("phoneCall", 28, { filled: true });
+      document.getElementById("icon-phone-911").appendChild(p911);
+
+      // Quick link icons
+      document.getElementById("icon-ambulance").appendChild(createIcon("ambulance", 28));
+      document.getElementById("icon-flame").appendChild(createIcon("flame", 28));
+
+      // Hospital card icons
+      document.getElementById("icon-hospital-card").appendChild(createIcon("ambulance", 24));
+      document.getElementById("icon-phone-hosp-1").appendChild(createIcon("phoneCall", 18, { filled: true }));
+      document.getElementById("icon-phone-hosp-2").appendChild(createIcon("phoneCall", 18, { filled: true }));
+
+      // Fire card icons
+      document.getElementById("icon-fire-card").appendChild(createIcon("flame", 24));
+      document.getElementById("icon-phone-fire-1").appendChild(createIcon("phoneCall", 18, { filled: true }));
+      document.getElementById("icon-phone-fire-2").appendChild(createIcon("phoneCall", 18, { filled: true }));
+
+      // Scroll-to-section handlers
+      document.getElementById("quick-link-hospital").addEventListener("click", function () {
+        document.getElementById("section-hospital").scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+      document.getElementById("quick-link-hospital").addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          document.getElementById("section-hospital").scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      });
+
+      document.getElementById("quick-link-fire").addEventListener("click", function () {
+        document.getElementById("section-fire").scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+      document.getElementById("quick-link-fire").addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          document.getElementById("section-fire").scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>
