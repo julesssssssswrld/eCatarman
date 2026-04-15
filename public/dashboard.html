@@ -36,6 +36,10 @@
         <span class="admin-sidebar__link-icon" id="nav-icon-activity"></span>
         <span>Activity Log</span>
       </a>
+      <a href="#" class="admin-sidebar__link" id="nav-emergency" data-view="emergency">
+        <span class="admin-sidebar__link-icon" id="nav-icon-emergency"></span>
+        <span>Emergency</span>
+      </a>
     </nav>
 
     <div class="admin-sidebar__footer">
@@ -189,6 +193,31 @@
       </div>
     </div>
 
+    <!-- ═══════════ EMERGENCY CONTACTS VIEW ═══════════ -->
+    <div class="admin-view" id="view-emergency" style="display:none;">
+      <div class="admin-card">
+        <div class="admin-card__header">
+          <h3 class="admin-card__title">Emergency Contact Numbers</h3>
+        </div>
+        <p style="color:var(--slate-500);font-size:0.875rem;font-weight:500;margin-bottom:1.25rem;padding:0 0.5rem;">Select a category to view and edit its contact numbers.</p>
+
+        <!-- Category Tabs -->
+        <div id="ec-category-tabs" style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1.5rem;"></div>
+
+        <!-- Contacts for selected category -->
+        <div id="ec-category-content" style="display:none;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+            <h4 id="ec-category-label" style="font-size:1.125rem;font-weight:800;color:var(--slate-700);"></h4>
+            <button class="admin-card__action" id="add-contact-btn">+ Add Contact</button>
+          </div>
+          <div id="emergency-contacts-list"></div>
+          <div style="margin-top:1.5rem;display:flex;gap:0.75rem;justify-content:flex-end;">
+            <button class="svc-module__btn svc-module__btn--apply" id="save-contacts-btn" style="padding:0.75rem 2rem;">Save Changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </main>
 
   <!-- Request Detail Modal -->
@@ -326,6 +355,7 @@
       document.getElementById("nav-icon-requests").appendChild(createIcon("clipboardList", 20));
       document.getElementById("nav-icon-departments").appendChild(createIcon("building", 20));
       document.getElementById("nav-icon-activity").appendChild(createIcon("clock", 20));
+      document.getElementById("nav-icon-emergency").appendChild(createIcon("phoneCall", 20));
       document.getElementById("logout-icon").appendChild(createIcon("logOut", 18));
       document.getElementById("user-avatar").appendChild(createIcon("user", 20));
       document.getElementById("detail-close").appendChild(createIcon("x", 20));
@@ -343,7 +373,7 @@
       /* ================================================================
          VIEW SWITCHING
          ================================================================ */
-      var views = { dashboard: "view-dashboard", requests: "view-requests", departments: "view-departments", activity: "view-activity" };
+      var views = { dashboard: "view-dashboard", requests: "view-requests", departments: "view-departments", activity: "view-activity", emergency: "view-emergency" };
       var navLinks = document.querySelectorAll(".admin-sidebar__link[data-view]");
       var dashLink = document.getElementById("nav-dashboard");
 
@@ -382,6 +412,11 @@
           document.getElementById("page-title").textContent = "Activity Log";
           document.getElementById("page-sub").textContent = "Chronological record of all admin actions on service requests.";
           renderActivityLog();
+        } else if (viewName === "emergency") {
+          document.getElementById("nav-emergency").classList.add("active");
+          document.getElementById("page-title").textContent = "Emergency Contacts";
+          document.getElementById("page-sub").textContent = "Manage emergency hotline numbers displayed on the public Emergency page.";
+          renderEmergencyContacts();
         }
       }
 
@@ -742,6 +777,169 @@
         clearActivityLog();
         renderActivityLog();
         showToast("Activity log cleared", "info");
+      });
+
+      /* ================================================================
+         EMERGENCY CONTACTS MANAGEMENT
+         ================================================================ */
+      var _emergencyContacts = [];
+      var _ecActiveCategory = null;
+      var EC_CATEGORIES = [
+        { id: "MDRRMO", label: "MDRRMO", icon: "📡" },
+        { id: "Hospital", label: "Hospital", icon: "🏥" },
+        { id: "Fire", label: "Fire Department", icon: "🚒" },
+        { id: "Police", label: "Police Station", icon: "🚔" },
+        { id: "Other", label: "Other", icon: "📞" },
+      ];
+
+      function renderEmergencyContacts() {
+        // Fetch all contacts from API
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "/api/emergency-contacts", true);
+        xhr.onload = function () {
+          if (xhr.status === 200) {
+            _emergencyContacts = JSON.parse(xhr.responseText);
+          } else {
+            _emergencyContacts = [];
+          }
+          renderCategoryTabs();
+          // Auto-select first category or keep current
+          if (_ecActiveCategory) {
+            selectCategory(_ecActiveCategory);
+          } else {
+            document.getElementById("ec-category-content").style.display = "none";
+          }
+        };
+        xhr.onerror = function () {
+          _emergencyContacts = [];
+          renderCategoryTabs();
+        };
+        xhr.send();
+      }
+
+      function renderCategoryTabs() {
+        var tabsContainer = document.getElementById("ec-category-tabs");
+        tabsContainer.innerHTML = "";
+
+        EC_CATEGORIES.forEach(function (cat) {
+          var count = _emergencyContacts.filter(function (c) { return c.category === cat.id; }).length;
+
+          var tab = document.createElement("button");
+          tab.className = "ec-tab" + (_ecActiveCategory === cat.id ? " ec-tab--active" : "");
+          tab.style.cssText = "display:flex;align-items:center;gap:0.5rem;padding:0.75rem 1.25rem;border-radius:1rem;border:1px solid var(--slate-200);background:" + (_ecActiveCategory === cat.id ? "var(--teal-50)" : "#fff") + ";color:" + (_ecActiveCategory === cat.id ? "var(--teal-700)" : "var(--slate-600)") + ";font-weight:700;font-size:0.875rem;cursor:pointer;transition:all 0.2s;" + (_ecActiveCategory === cat.id ? "border-color:var(--teal-200);box-shadow:0 0 0 3px var(--teal-50);" : "");
+          tab.innerHTML = '<span>' + cat.icon + '</span><span>' + cat.label + '</span>' + (count > 0 ? '<span style="background:' + (_ecActiveCategory === cat.id ? 'var(--teal-600)' : 'var(--slate-300)') + ';color:#fff;font-size:0.6875rem;font-weight:800;padding:0.125rem 0.5rem;border-radius:9999px;">' + count + '</span>' : '');
+
+          tab.addEventListener("click", function () {
+            selectCategory(cat.id);
+          });
+
+          tabsContainer.appendChild(tab);
+        });
+      }
+
+      function selectCategory(categoryId) {
+        _ecActiveCategory = categoryId;
+        renderCategoryTabs(); // update active state
+
+        var catObj = EC_CATEGORIES.find(function (c) { return c.id === categoryId; });
+        document.getElementById("ec-category-label").textContent = catObj ? catObj.icon + " " + catObj.label + " Contacts" : categoryId;
+        document.getElementById("ec-category-content").style.display = "block";
+
+        renderContactRows();
+      }
+
+      function renderContactRows() {
+        var list = document.getElementById("emergency-contacts-list");
+        list.innerHTML = "";
+
+        var filtered = [];
+        _emergencyContacts.forEach(function (c, i) {
+          if (c.category === _ecActiveCategory) {
+            filtered.push({ contact: c, globalIdx: i });
+          }
+        });
+
+        if (filtered.length === 0) {
+          list.innerHTML = '<div class="admin-empty" style="padding:2rem;"><p class="admin-empty__title">No contacts in this category</p><p class="admin-empty__desc">Click "+ Add Contact" to create one.</p></div>';
+          return;
+        }
+
+        filtered.forEach(function (entry) {
+          var contact = entry.contact;
+          var idx = entry.globalIdx;
+
+          var row = document.createElement("div");
+          row.style.cssText = "display:grid;grid-template-columns:1fr 1fr auto;gap:0.75rem;align-items:center;padding:1rem;border:1px solid var(--slate-200);border-radius:1rem;margin-bottom:0.75rem;background:var(--slate-50);";
+
+          row.innerHTML = ''
+            + '<div>'
+            + '  <label style="font-size:0.625rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--slate-400);display:block;margin-bottom:0.25rem;">Label</label>'
+            + '  <input type="text" class="form-input ec-label" value="' + (contact.label || '') + '" placeholder="e.g. Smart, Globe, Main Line" style="padding:0.625rem 0.75rem;font-size:0.875rem;">'
+            + '</div>'
+            + '<div>'
+            + '  <label style="font-size:0.625rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--slate-400);display:block;margin-bottom:0.25rem;">Number</label>'
+            + '  <input type="tel" class="form-input ec-number" value="' + (contact.number || '') + '" placeholder="e.g. 0949 151 3810" style="padding:0.625rem 0.75rem;font-size:0.875rem;">'
+            + '</div>'
+            + '<div style="padding-top:1rem;">'
+            + '  <button class="ec-delete-btn" style="background:var(--red-50);color:var(--red-500);border:1px solid var(--red-100);border-radius:0.75rem;width:2.5rem;height:2.5rem;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;" title="Remove contact">'
+            + '    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>'
+            + '  </button>'
+            + '</div>';
+
+          list.appendChild(row);
+
+          // Sync edits to cache
+          row.querySelector(".ec-label").addEventListener("input", function () {
+            _emergencyContacts[idx].label = this.value;
+          });
+          row.querySelector(".ec-number").addEventListener("input", function () {
+            _emergencyContacts[idx].number = this.value;
+          });
+
+          // Delete
+          row.querySelector(".ec-delete-btn").addEventListener("click", function () {
+            _emergencyContacts.splice(idx, 1);
+            renderCategoryTabs();
+            renderContactRows();
+          });
+        });
+      }
+
+      // Add Contact button
+      document.getElementById("add-contact-btn").addEventListener("click", function () {
+        if (!_ecActiveCategory) return;
+        _emergencyContacts.push({ id: "contact-" + Date.now(), label: "", number: "", category: _ecActiveCategory });
+        renderCategoryTabs();
+        renderContactRows();
+      });
+
+      // Save button
+      document.getElementById("save-contacts-btn").addEventListener("click", function () {
+        // Validate
+        var valid = true;
+        _emergencyContacts.forEach(function (c) {
+          if (!c.label.trim() || !c.number.trim()) valid = false;
+        });
+        if (!valid) {
+          showToast("All contacts must have a label and number", "error");
+          return;
+        }
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("PUT", "/api/emergency-contacts", true);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.onload = function () {
+          if (xhr.status === 200) {
+            showToast("Emergency contacts saved!", "success");
+            renderCategoryTabs();
+          } else {
+            showToast("Failed to save contacts", "error");
+          }
+        };
+        xhr.onerror = function () {
+          showToast("Network error saving contacts", "error");
+        };
+        xhr.send(JSON.stringify(_emergencyContacts));
       });
 
       function getFieldLabel(serviceId, fieldName) {

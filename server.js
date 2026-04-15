@@ -274,6 +274,32 @@ const server = http.createServer(async (req, res) => {
   }
 
   // =====================================================================
+  //  EMERGENCY CONTACTS API
+  // =====================================================================
+
+  // ── GET /api/emergency-contacts — List all emergency contacts ────────
+  if (urlPath === "/api/emergency-contacts" && req.method === "GET") {
+    sendJSON(res, 200, db.getEmergencyContacts());
+    return;
+  }
+
+  // ── PUT /api/emergency-contacts — Update all emergency contacts ──────
+  if (urlPath === "/api/emergency-contacts" && req.method === "PUT") {
+    try {
+      const contacts = await parseBody(req);
+      if (!Array.isArray(contacts)) {
+        return sendJSON(res, 400, { error: "Must be an array of contacts" });
+      }
+      const updated = db.updateEmergencyContacts(contacts);
+      console.log(`📞 Emergency contacts updated (${updated.length} entries)`);
+      sendJSON(res, 200, { success: true, contacts: updated });
+    } catch (err) {
+      sendJSON(res, 500, { error: err.message });
+    }
+    return;
+  }
+
+  // =====================================================================
   //  EMAIL API
   // =====================================================================
 

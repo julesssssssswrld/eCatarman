@@ -12,6 +12,10 @@ const DB_PATH = path.join(__dirname, "db.json");
 const DEFAULT_DB = {
   requests: [],
   demoLoaded: false,
+  emergencyContacts: [
+    { id: "mdrrmo-smart", label: "Smart", number: "0949 151 3810", category: "MDRRMO" },
+    { id: "mdrrmo-globe", label: "Globe", number: "0905 547 7522", category: "MDRRMO" },
+  ],
 };
 
 /* ---- Read ---- */
@@ -22,7 +26,13 @@ function readDB() {
       return DEFAULT_DB;
     }
     const raw = fs.readFileSync(DB_PATH, "utf-8");
-    return JSON.parse(raw);
+    const db = JSON.parse(raw);
+    // Ensure emergencyContacts exists (migration)
+    if (!db.emergencyContacts) {
+      db.emergencyContacts = DEFAULT_DB.emergencyContacts;
+      writeDB(db);
+    }
+    return db;
   } catch (e) {
     console.error("⚠ DB read error, resetting:", e.message);
     writeDB(DEFAULT_DB);
@@ -70,6 +80,18 @@ function deleteRequest(id) {
   return db.requests.length < before;
 }
 
+/* ---- Emergency Contacts ---- */
+function getEmergencyContacts() {
+  return readDB().emergencyContacts || [];
+}
+
+function updateEmergencyContacts(contacts) {
+  const db = readDB();
+  db.emergencyContacts = contacts;
+  writeDB(db);
+  return contacts;
+}
+
 /* ---- Demo Seeder ---- */
 function isDemoLoaded() {
   return readDB().demoLoaded;
@@ -87,6 +109,8 @@ module.exports = {
   createRequest,
   updateRequest,
   deleteRequest,
+  getEmergencyContacts,
+  updateEmergencyContacts,
   isDemoLoaded,
   markDemoLoaded,
 };

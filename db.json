@@ -267,5 +267,19 @@
       "routedTo": []
     }
   ],
-  "demoLoaded": true
+  "demoLoaded": true,
+  "emergencyContacts": [
+    {
+      "id": "mdrrmo-smart",
+      "label": "Smart",
+      "number": "0949 151 3810",
+      "category": "MDRRMO"
+    },
+    {
+      "id": "mdrrmo-globe",
+      "label": "Globe",
+      "number": "0905 547 7522",
+      "category": "MDRRMO"
+    }
+  ]
 }
