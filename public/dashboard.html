@@ -808,11 +808,8 @@
         var list = document.getElementById("emergency-contacts-list");
         list.innerHTML = "";
 
-        var filtered = [];
-        _emergencyContacts.forEach(function (c, i) {
-          if (c.category === _ecActiveCategory) {
-            filtered.push({ contact: c, globalIdx: i });
-          }
+        var filtered = _emergencyContacts.filter(function (c) {
+          return c.category === _ecActiveCategory;
         });
 
         if (filtered.length === 0) {
@@ -820,10 +817,7 @@
           return;
         }
 
-        filtered.forEach(function (entry) {
-          var contact = entry.contact;
-          var idx = entry.globalIdx;
-
+        filtered.forEach(function (contact) {
           var row = document.createElement("div");
           row.style.cssText = "display:grid;grid-template-columns:1fr 1fr auto;gap:0.75rem;align-items:center;padding:1rem;border:1px solid var(--slate-200);border-radius:1rem;margin-bottom:0.75rem;background:var(--slate-50);";
 
@@ -844,17 +838,18 @@
 
           list.appendChild(row);
 
-          // Sync edits to cache
+          // Sync edits — reference contact object directly (not by index)
           row.querySelector(".ec-label").addEventListener("input", function () {
-            _emergencyContacts[idx].label = this.value;
+            contact.label = this.value;
           });
           row.querySelector(".ec-number").addEventListener("input", function () {
-            _emergencyContacts[idx].number = this.value;
+            contact.number = this.value;
           });
 
-          // Delete
+          // Delete — find by id to avoid stale index bugs
           row.querySelector(".ec-delete-btn").addEventListener("click", function () {
-            _emergencyContacts.splice(idx, 1);
+            var contactId = contact.id;
+            _emergencyContacts = _emergencyContacts.filter(function (c) { return c.id !== contactId; });
             renderCategoryTabs();
             renderContactRows();
           });
@@ -864,7 +859,12 @@
       // Add Contact button
       document.getElementById("add-contact-btn").addEventListener("click", function () {
         if (!_ecActiveCategory) return;
-        _emergencyContacts.push({ id: "contact-" + Date.now(), label: "", number: "", category: _ecActiveCategory });
+        _emergencyContacts.push({
+          id: _ecActiveCategory.toLowerCase() + "-" + Date.now() + "-" + Math.random().toString(36).slice(2, 6),
+          label: "",
+          number: "",
+          category: _ecActiveCategory,
+        });
         renderCategoryTabs();
         renderContactRows();
       });
