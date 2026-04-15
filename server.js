@@ -509,5 +509,5 @@ const server = http.createServer(async (req, res) => {
 
 server.listen(PORT, () => {
   console.log(`Catarman Portal running at http://localhost:${PORT}`);
-  console.log(`📁 Database: ${path.resolve("db.json")}`);
+  console.log(`📁 Database: ${path.resolve("ecatarman.sqlite")} (SQLite)`);
 });
