@@ -45,6 +45,19 @@
         <!-- Rendered by JS from data.js -->
       </div>
 
+      <!-- Downloadable Forms Section -->
+      <div class="forms-section" id="forms">
+        <div class="section-header">
+          <div>
+            <h2 class="section-header__title">Downloadable Forms</h2>
+            <p class="section-header__sub">Official application forms and checklists from municipal departments. Download, print, and prepare before visiting.</p>
+          </div>
+        </div>
+        <div id="forms-grid" class="forms-grid">
+          <!-- Rendered by JS from data.js resources -->
+        </div>
+      </div>
+
     </div>
   </main>
 
@@ -201,6 +214,43 @@
         modulesContainer.appendChild(module);
       });
 
+      /* ================================================================
+         RENDER DOWNLOADABLE FORMS
+         ================================================================ */
+      var formsGrid = document.getElementById("forms-grid");
+      eCatarman.resources.forEach(function (dept) {
+        var card = document.createElement("div");
+        card.className = "forms-card";
+
+        var cardTitle = document.createElement("h3");
+        cardTitle.className = "forms-card__title";
+        cardTitle.appendChild(createIcon("fileText", 20));
+        var titleText = document.createElement("span");
+        titleText.textContent = dept.department;
+        cardTitle.appendChild(titleText);
+        card.appendChild(cardTitle);
+
+        var list = document.createElement("ul");
+        list.className = "forms-card__list";
+
+        dept.forms.forEach(function (f) {
+          var li = document.createElement("li");
+          var link = document.createElement("a");
+          link.href = f.url;
+          link.target = "_blank";
+          link.className = "forms-card__link";
+          link.appendChild(createIcon("download", 14));
+          var linkText = document.createElement("span");
+          linkText.textContent = f.name;
+          link.appendChild(linkText);
+          li.appendChild(link);
+          list.appendChild(li);
+        });
+
+        card.appendChild(list);
+        formsGrid.appendChild(card);
+      });
+
       // Scroll to hash on load
       if (window.location.hash) {
         var target = document.querySelector(window.location.hash);
@@ -241,13 +291,33 @@
         var form = document.createElement("form");
         form.id = "apply-form";
 
+        // Find the first non-section select field — this is the "gate" field
+        var gateField = null;
+        for (var fi = 0; fi < svc.fields.length; fi++) {
+          if (svc.fields[fi].type === "select" && svc.fields[fi].type !== "section") {
+            gateField = svc.fields[fi];
+            break;
+          }
+        }
+
+        // Container for fields that appear AFTER the gate selection
+        var gatedContainer = document.createElement("div");
+        gatedContainer.className = "form-gated-fields";
+        gatedContainer.style.display = "none";
+
+        var passedGate = false;
+
         svc.fields.forEach(function (field) {
           // Section headers — visual grouping only
           if (field.type === "section") {
             var sectionDiv = document.createElement("div");
             sectionDiv.className = "form-section-header";
             sectionDiv.textContent = field.label;
-            form.appendChild(sectionDiv);
+            if (passedGate) {
+              gatedContainer.appendChild(sectionDiv);
+            } else {
+              form.appendChild(sectionDiv);
+            }
             return;
           }
 
@@ -290,13 +360,42 @@
 
           group.appendChild(label);
           group.appendChild(input);
-          form.appendChild(group);
+
+          // If this IS the gate field, attach change listener
+          if (gateField && field.name === gateField.name) {
+            input.addEventListener("change", function () {
+              var submitBtn = form.querySelector(".form-submit");
+              if (input.value && input.value !== "") {
+                gatedContainer.style.display = "";
+                gatedContainer.style.animation = "fadeSlideIn 0.3s ease";
+                if (submitBtn) {
+                  submitBtn.disabled = false;
+                  submitBtn.classList.remove("form-submit--disabled");
+                }
+              } else {
+                gatedContainer.style.display = "none";
+                if (submitBtn) {
+                  submitBtn.disabled = true;
+                  submitBtn.classList.add("form-submit--disabled");
+                }
+              }
+            });
+            form.appendChild(group);
+            passedGate = true;
+          } else if (passedGate) {
+            gatedContainer.appendChild(group);
+          } else {
+            form.appendChild(group);
+          }
         });
+
+        form.appendChild(gatedContainer);
 
         var submitBtn = document.createElement("button");
         submitBtn.type = "submit";
-        submitBtn.className = "form-submit";
+        submitBtn.className = "form-submit form-submit--disabled";
         submitBtn.textContent = "Submit Application";
+        submitBtn.disabled = true;
         form.appendChild(submitBtn);
 
         form.addEventListener("submit", function (ev) {

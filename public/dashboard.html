@@ -311,7 +311,14 @@
       var navLinks = document.querySelectorAll(".admin-sidebar__link[data-view]");
       var dashLink = document.getElementById("nav-dashboard");
 
-      function showView(viewName) {
+      function showView(viewName, internalCall) {
+        if (!views[viewName]) viewName = "dashboard";
+
+        if (!internalCall) {
+          window.location.hash = viewName;
+          return; // Let the hashchange event trigger the actual render
+        }
+
         Object.values(views).forEach(function (id) {
           document.getElementById(id).style.display = "none";
         });
@@ -342,6 +349,10 @@
         }
       }
 
+      window.addEventListener("hashchange", function() {
+        showView(window.location.hash.substring(1), true);
+      });
+
       navLinks.forEach(function (link) {
         link.addEventListener("click", function (e) {
           e.preventDefault();
@@ -354,7 +365,8 @@
         showView("dashboard");
       });
 
-      document.getElementById("view-all-btn").addEventListener("click", function () {
+      document.getElementById("view-all-btn").addEventListener("click", function (e) {
+        e.preventDefault();
         showView("requests");
       });
 
@@ -981,7 +993,11 @@
       /* ================================================================
          INIT
          ================================================================ */
-      renderDashboard();
+      if (window.location.hash) {
+        showView(window.location.hash.substring(1), true);
+      } else {
+        showView("dashboard", true); // Default to dashboard view
+      }
     });
   </script>
 

@@ -81,7 +81,7 @@ function renderNavigation() {
       </div>
       <div class="site-footer__bottom">
         <p class="site-footer__copy">&copy; 2026 Municipality of Catarman, Northern Samar. All rights reserved.</p>
-        <a href="/admin" class="site-footer__admin-link">Staff Portal</a>
+        <a href="/admin" class="site-footer__admin-link">Admin</a>
       </div>
     </div>
   `;
