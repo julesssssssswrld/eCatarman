@@ -23,6 +23,8 @@ const routes = {
   "/": "/public/index.html",
   "/services": "/public/services.html",
   "/emergency": "/public/emergency.html",
+  "/admin": "/public/admin.html",
+  "/dashboard": "/public/dashboard.html",
 };
 
 const server = http.createServer((req, res) => {

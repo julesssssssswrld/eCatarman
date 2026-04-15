@@ -43,7 +43,7 @@ function renderNavigation() {
   const right = document.createElement("div");
   right.className = "desktop-nav__right";
   right.innerHTML = `
-    <button class="sign-in-btn">Sign In</button>
+    <a href="/admin" class="sign-in-btn">Sign In</a>
   `;
 
   inner.appendChild(logoLink);

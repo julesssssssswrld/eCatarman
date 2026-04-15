@@ -1,10 +1,10 @@
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Services | Catarman Web Portal</title>
-  <meta name="description" content="Catarman LGU Services Portal — Browse and avail municipal services">
+  <title>Services | eCatarman Modular E-Governance</title>
+  <meta name="description" content="eCatarman LGU Services Portal — Apply for municipal services, track your requests, and download forms.">
   <link rel="icon" href="/favicon.ico">
   <link rel="stylesheet" href="/css/styles.css">
 </head>
@@ -16,165 +16,405 @@
       <!-- Header -->
       <div class="services-header">
         <div class="services-header__content">
-          <div class="services-header__badge">Service Directory</div>
+          <div class="services-header__badge">Service Modules</div>
           <h1 class="services-header__title">LGU Services Portal</h1>
           <p class="services-header__desc">
-            Browse and avail of our digitized municipal services. Choose to apply online, download requirements, or book an appointment for faster processing at the municipal hall.
+            Six modular, integration-ready service departments. Apply online, track your request status, and download requirements — all from one centralized platform.
           </p>
-
         </div>
       </div>
 
-      <!-- Content Grid -->
-      <div class="services-content">
-
-        <!-- Main column -->
-        <div class="services-main">
-
-          <!-- Primary e-Services -->
-          <section>
-            <div class="section-title-bar">
-              <span class="section-title-bar__bar teal"></span>
-              <h2 class="section-title-bar__text">Primary e-Services</h2>
-            </div>
-            <div class="primary-services-grid">
-              <div class="service-hero-card">
-                <div class="service-hero-card__tag">Online</div>
-                <div class="service-hero-card__icon" id="icon-biz-permit"></div>
-                <h3 class="service-hero-card__title">Business Permit</h3>
-              </div>
-              <div class="service-hero-card">
-                <div class="service-hero-card__tag">Online</div>
-                <div class="service-hero-card__icon" id="icon-property-tax"></div>
-                <h3 class="service-hero-card__title">Real Property Tax</h3>
-              </div>
-              <div class="service-hero-card">
-                <div class="service-hero-card__tag">Online Form</div>
-                <div class="service-hero-card__icon" id="icon-civil-reg"></div>
-                <h3 class="service-hero-card__title">Civil Registry</h3>
-              </div>
-            </div>
-          </section>
-
-          <!-- Assistance & Grants -->
-          <section>
-            <div class="section-title-bar">
-              <span class="section-title-bar__bar amber"></span>
-              <h2 class="section-title-bar__text">Assistance &amp; Grants</h2>
-            </div>
-            <div class="assistance-grid">
-              <div class="featured-card">
-                <div class="featured-card__icon rose" id="icon-medical"></div>
-                <div>
-                  <h4 class="featured-card__title">Medical Assistance</h4>
-                  <p class="featured-card__desc">Financial aid for hospitalization and medicines.</p>
-                </div>
-              </div>
-              <div class="featured-card">
-                <div class="featured-card__icon indigo" id="icon-scholarship"></div>
-                <div>
-                  <h4 class="featured-card__title">Scholarship Program</h4>
-                  <p class="featured-card__desc">Educational grants for deserving college students.</p>
-                </div>
-              </div>
-              <div class="featured-card">
-                <div class="featured-card__icon emerald" id="icon-livelihood"></div>
-                <div>
-                  <h4 class="featured-card__title">Livelihood Training</h4>
-                  <p class="featured-card__desc">Skills development and loans for local MSMEs.</p>
-                </div>
-              </div>
-              <div class="featured-card">
-                <div class="featured-card__icon blue" id="icon-transport"></div>
-                <div>
-                  <h4 class="featured-card__title">Transport &amp; Rescue</h4>
-                  <p class="featured-card__desc">LGU vehicles for emergency community deployment.</p>
-                </div>
-              </div>
-            </div>
-          </section>
-
+      <!-- Track Your Request -->
+      <div class="track-bar" id="track-section">
+        <h2 class="track-bar__title">
+          <span id="track-icon"></span>
+          Track Your Request
+        </h2>
+        <div class="track-bar__form">
+          <input type="text" class="track-bar__input" id="track-input" placeholder="Enter Transaction ID (e.g. TXN-2026-0001)">
+          <button class="track-bar__btn" id="track-btn">
+            <span id="track-search-icon"></span>
+            Track Status
+          </button>
         </div>
+        <div class="track-result" id="track-result"></div>
+      </div>
 
-        <!-- Sidebar -->
-        <div class="services-sidebar">
-
-          <!-- Guidance card -->
-          <div class="guidance-card">
-            <div class="guidance-card__bg"></div>
-            <div class="guidance-card__content">
-              <h3 class="guidance-card__title">Need guidance?</h3>
-              <p class="guidance-card__desc">Read our step-by-step citizen guides on how to avail municipal services properly.</p>
-              <button class="guidance-card__btn">Citizen's Charter</button>
-            </div>
-          </div>
-
-          <!-- Category list -->
-          <div class="category-card">
-            <h3 class="category-card__title">Service Categories</h3>
-            <div class="category-list">
-              <div class="category-item">
-                <span class="category-item__text">Health &amp; Nutrition</span>
-                <span class="category-item__arrow" id="cat-arrow-1"></span>
-              </div>
-              <div class="category-item">
-                <span class="category-item__text">Social Services</span>
-                <span class="category-item__arrow" id="cat-arrow-2"></span>
-              </div>
-              <div class="category-item">
-                <span class="category-item__text">Engineering &amp; Infrastructure</span>
-                <span class="category-item__arrow" id="cat-arrow-3"></span>
-              </div>
-              <div class="category-item">
-                <span class="category-item__text">Agricultural Support</span>
-                <span class="category-item__arrow" id="cat-arrow-4"></span>
-              </div>
-              <div class="category-item">
-                <span class="category-item__text">Legal Matters</span>
-                <span class="category-item__arrow" id="cat-arrow-5"></span>
-              </div>
-            </div>
-          </div>
-
-        </div>
-
+      <!-- Service Modules List -->
+      <div id="service-modules">
+        <!-- Rendered by JS from data.js -->
       </div>
 
     </div>
   </main>
 
+  <!-- Application Modal -->
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal" id="modal">
+      <div class="modal__header">
+        <h2 class="modal__title" id="modal-title">Apply</h2>
+        <button class="modal__close" id="modal-close"></button>
+      </div>
+      <div class="modal__body" id="modal-body">
+        <!-- Form rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
   <script src="/js/icons.js"></script>
+  <script src="/js/data.js"></script>
   <script src="/js/navigation.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", function () {
-      // Search icon
-      const searchWrap = document.getElementById("search-icon-wrap");
-      if (searchWrap) {
-        const searchIcon = createIcon("search", 24);
-        searchWrap.prepend(searchIcon);
+
+      /* ================================================================
+         RENDER SERVICE MODULES
+         ================================================================ */
+      var modulesContainer = document.getElementById("service-modules");
+
+      eCatarman.services.forEach(function (svc) {
+        var dept = eCatarman.departments.find(function (d) { return d.id === svc.department; });
+
+        var module = document.createElement("div");
+        module.className = "svc-module";
+        module.id = svc.id;
+
+        // Header
+        var header = document.createElement("div");
+        header.className = "svc-module__header";
+
+        var icon = document.createElement("div");
+        icon.className = "svc-module__icon " + svc.color;
+        icon.appendChild(createIcon(svc.icon, 28));
+
+        var info = document.createElement("div");
+        info.className = "svc-module__info";
+
+        var name = document.createElement("h3");
+        name.className = "svc-module__name";
+        name.textContent = svc.name;
+
+        var deptLabel = document.createElement("p");
+        deptLabel.className = "svc-module__dept";
+        deptLabel.textContent = dept ? dept.shortName : "";
+
+        var desc = document.createElement("p");
+        desc.className = "svc-module__desc";
+        desc.textContent = svc.description;
+
+        info.appendChild(name);
+        info.appendChild(deptLabel);
+        info.appendChild(desc);
+
+        var tag = document.createElement("span");
+        tag.className = "svc-module__tag";
+        tag.textContent = svc.tag;
+
+        header.appendChild(icon);
+        header.appendChild(info);
+        header.appendChild(tag);
+
+        // Body
+        var body = document.createElement("div");
+        body.className = "svc-module__body";
+
+        // Sub-services
+        var subTitle = document.createElement("p");
+        subTitle.className = "svc-module__sub-title";
+        subTitle.textContent = "Available Services";
+
+        var subList = document.createElement("div");
+        subList.className = "svc-module__sub-list";
+        svc.subServices.forEach(function (sub) {
+          var item = document.createElement("span");
+          item.className = "svc-module__sub-item";
+          item.textContent = sub;
+          subList.appendChild(item);
+        });
+
+        body.appendChild(subTitle);
+        body.appendChild(subList);
+
+        // Fees table (if applicable)
+        if (svc.fees && svc.fees.length > 0) {
+          var feesTitle = document.createElement("p");
+          feesTitle.className = "svc-module__sub-title";
+          feesTitle.textContent = "Fee Schedule";
+
+          var table = document.createElement("table");
+          table.className = "svc-module__fees";
+          var thead = document.createElement("thead");
+          thead.innerHTML = "<tr><th>Service</th><th>Fee</th></tr>";
+          var tbody = document.createElement("tbody");
+          svc.fees.forEach(function (f) {
+            var row = document.createElement("tr");
+            row.innerHTML = "<td>" + f.service + "</td><td>₱" + f.fee.toLocaleString("en-PH", { minimumFractionDigits: 2 }) + "</td>";
+            tbody.appendChild(row);
+          });
+          table.appendChild(thead);
+          table.appendChild(tbody);
+          body.appendChild(feesTitle);
+          body.appendChild(table);
+        }
+
+        // Downloadable Forms (from catarman.gov.ph/resources)
+        var svcResources = eCatarman.resources.find(function (r) { return r.departmentId === svc.department; });
+        if (svcResources && svcResources.forms.length > 0) {
+          var formsTitle = document.createElement("p");
+          formsTitle.className = "svc-module__sub-title";
+          formsTitle.textContent = "Downloadable Forms";
+
+          var formsList = document.createElement("div");
+          formsList.className = "svc-module__sub-list";
+          svcResources.forms.forEach(function (form) {
+            var link = document.createElement("a");
+            link.className = "svc-module__sub-item";
+            link.href = form.url;
+            link.target = "_blank";
+            link.rel = "noopener";
+            link.textContent = "📄 " + form.name;
+            link.style.textDecoration = "none";
+            link.style.cursor = "pointer";
+            link.title = "Download " + form.name;
+            formsList.appendChild(link);
+          });
+          body.appendChild(formsTitle);
+          body.appendChild(formsList);
+        }
+
+        // Actions
+        var actions = document.createElement("div");
+        actions.className = "svc-module__actions";
+
+        var applyBtn = document.createElement("button");
+        applyBtn.className = "svc-module__btn svc-module__btn--apply";
+        applyBtn.appendChild(createIcon("send", 16));
+        applyBtn.appendChild(document.createTextNode(" Apply Online"));
+        applyBtn.dataset.serviceId = svc.id;
+        applyBtn.addEventListener("click", openApplyModal);
+
+        actions.appendChild(applyBtn);
+        body.appendChild(actions);
+
+        module.appendChild(header);
+        module.appendChild(body);
+        modulesContainer.appendChild(module);
+      });
+
+      // Scroll to hash on load
+      if (window.location.hash) {
+        var target = document.querySelector(window.location.hash);
+        if (target) {
+          setTimeout(function () {
+            target.scrollIntoView({ behavior: "smooth", block: "start" });
+          }, 300);
+        }
       }
 
-      // Filter button icon
-      const filterBtn = document.getElementById("filter-btn");
-      if (filterBtn) {
-        const filterIcon = createIcon("filter", 20);
-        filterBtn.prepend(filterIcon);
+      /* ================================================================
+         TRACK ICONS
+         ================================================================ */
+      document.getElementById("track-icon").appendChild(createIcon("search", 22));
+      document.getElementById("track-search-icon").appendChild(createIcon("search", 18));
+
+      /* ================================================================
+         MODAL LOGIC
+         ================================================================ */
+      var modalOverlay = document.getElementById("modal-overlay");
+      var modalClose = document.getElementById("modal-close");
+      modalClose.appendChild(createIcon("x", 20));
+
+      modalClose.addEventListener("click", closeModal);
+      modalOverlay.addEventListener("click", function (e) {
+        if (e.target === modalOverlay) closeModal();
+      });
+
+      function openApplyModal(e) {
+        var serviceId = e.currentTarget.dataset.serviceId;
+        var svc = eCatarman.services.find(function (s) { return s.id === serviceId; });
+        if (!svc) return;
+
+        document.getElementById("modal-title").textContent = "Apply — " + svc.name;
+        var body = document.getElementById("modal-body");
+        body.innerHTML = "";
+
+        var form = document.createElement("form");
+        form.id = "apply-form";
+
+        svc.fields.forEach(function (field) {
+          var group = document.createElement("div");
+          group.className = "form-group";
+
+          var label = document.createElement("label");
+          label.className = "form-label";
+          label.textContent = field.label + (field.required ? " *" : "");
+          label.setAttribute("for", "field-" + field.name);
+
+          var input;
+          if (field.type === "select") {
+            input = document.createElement("select");
+            input.className = "form-select";
+            var placeholder = document.createElement("option");
+            placeholder.value = "";
+            placeholder.textContent = "Select...";
+            input.appendChild(placeholder);
+            (field.options || []).forEach(function (opt) {
+              var option = document.createElement("option");
+              option.value = opt;
+              option.textContent = opt;
+              input.appendChild(option);
+            });
+          } else if (field.type === "textarea") {
+            input = document.createElement("textarea");
+            input.className = "form-textarea";
+            input.placeholder = "Enter " + field.label.toLowerCase();
+          } else {
+            input = document.createElement("input");
+            input.className = "form-input";
+            input.type = field.type || "text";
+            input.placeholder = "Enter " + field.label.toLowerCase();
+          }
+
+          input.name = field.name;
+          input.id = "field-" + field.name;
+          if (field.required) input.required = true;
+
+          group.appendChild(label);
+          group.appendChild(input);
+          form.appendChild(group);
+        });
+
+        var submitBtn = document.createElement("button");
+        submitBtn.type = "submit";
+        submitBtn.className = "form-submit";
+        submitBtn.textContent = "Submit Application";
+        form.appendChild(submitBtn);
+
+        form.addEventListener("submit", function (ev) {
+          ev.preventDefault();
+          var formData = {};
+          svc.fields.forEach(function (field) {
+            var el = form.querySelector("[name='" + field.name + "']");
+            formData[field.name] = el ? el.value : "";
+          });
+
+          var result = eCatarman.submitRequest(serviceId, formData);
+          if (result) {
+            body.innerHTML = "";
+            var success = document.createElement("div");
+            success.className = "modal__success";
+
+            var iconWrap = document.createElement("div");
+            iconWrap.className = "modal__success-icon";
+            iconWrap.appendChild(createIcon("check", 32));
+
+            var title = document.createElement("h3");
+            title.textContent = "Application Submitted!";
+
+            var p1 = document.createElement("p");
+            p1.textContent = "Your request has been received. Save your transaction ID:";
+
+            var txnId = document.createElement("div");
+            txnId.className = "modal__txn-id";
+            txnId.textContent = result.id;
+
+            var p2 = document.createElement("p");
+            p2.textContent = "Use this ID to track your request status anytime.";
+
+            success.appendChild(iconWrap);
+            success.appendChild(title);
+            success.appendChild(p1);
+            success.appendChild(txnId);
+            success.appendChild(p2);
+            body.appendChild(success);
+
+            document.getElementById("modal-title").textContent = "Success";
+          }
+        });
+
+        body.appendChild(form);
+        modalOverlay.classList.add("active");
       }
 
-      // Primary e-Services icons
-      document.getElementById("icon-biz-permit").appendChild(createIcon("fileText", 28));
-      document.getElementById("icon-property-tax").appendChild(createIcon("home", 28));
-      document.getElementById("icon-civil-reg").appendChild(createIcon("fileBadge", 28));
+      function closeModal() {
+        modalOverlay.classList.remove("active");
+      }
 
-      // Assistance icons
-      document.getElementById("icon-medical").appendChild(createIcon("heart", 24));
-      document.getElementById("icon-scholarship").appendChild(createIcon("graduationCap", 24));
-      document.getElementById("icon-livelihood").appendChild(createIcon("briefcase", 24));
-      document.getElementById("icon-transport").appendChild(createIcon("bus", 24));
+      /* ================================================================
+         TRACK REQUEST LOGIC
+         ================================================================ */
+      var trackBtn = document.getElementById("track-btn");
+      var trackInput = document.getElementById("track-input");
+      var trackResult = document.getElementById("track-result");
 
-      // Category arrows
-      for (let i = 1; i <= 5; i++) {
-        document.getElementById("cat-arrow-" + i).appendChild(createIcon("arrowRight", 18));
+      trackBtn.addEventListener("click", doTrack);
+      trackInput.addEventListener("keydown", function (e) {
+        if (e.key === "Enter") doTrack();
+      });
+
+      function doTrack() {
+        var id = trackInput.value.trim().toUpperCase();
+        if (!id) return;
+
+        var request = eCatarman.getRequestById(id);
+        trackResult.innerHTML = "";
+
+        if (!request) {
+          trackResult.className = "track-result visible";
+          trackResult.innerHTML = '<div class="track-not-found"><p>No request found for <strong>' + id + '</strong>. Please check the transaction ID and try again.</p></div>';
+          return;
+        }
+
+        var statusColor = eCatarman.STATUS_COLORS[request.status] || "blue";
+
+        var html = '<div class="track-result__header">';
+        html += '<span class="track-result__txn">' + request.id + '</span>';
+        html += '<span class="status-badge status-badge--' + statusColor + '">' + request.status + '</span>';
+        html += '</div>';
+
+        html += '<div class="track-result__details">';
+        html += '<div class="track-detail"><div class="track-detail__label">Service</div><div class="track-detail__value">' + request.serviceName + '</div></div>';
+        html += '<div class="track-detail"><div class="track-detail__label">Department</div><div class="track-detail__value">' + request.departmentName + '</div></div>';
+        html += '<div class="track-detail"><div class="track-detail__label">Applicant</div><div class="track-detail__value">' + request.citizenName + '</div></div>';
+        html += '<div class="track-detail"><div class="track-detail__label">Submitted</div><div class="track-detail__value">' + eCatarman.formatDate(request.submittedAt) + '</div></div>';
+        html += '</div>';
+
+        if (request.notes.length > 0) {
+          html += '<p class="svc-module__sub-title" style="margin-top:0">Status Timeline</p>';
+          html += '<div class="track-timeline">';
+          request.notes.forEach(function (note) {
+            html += '<div class="track-timeline__item">';
+            html += '<div class="track-timeline__dot"></div>';
+            html += '<div class="track-timeline__status">' + note.status + '</div>';
+            html += '<div class="track-timeline__note">' + note.text + '</div>';
+            html += '<div class="track-timeline__time">' + eCatarman.formatDateTime(note.timestamp) + '</div>';
+            html += '</div>';
+          });
+          html += '</div>';
+        }
+
+        if (request.routedTo.length > 0) {
+          html += '<p class="svc-module__sub-title">Cross-Department Routing</p>';
+          html += '<div class="svc-module__sub-list">';
+          request.routedTo.forEach(function (deptId) {
+            var dept = eCatarman.departments.find(function (d) { return d.id === deptId; });
+            html += '<span class="svc-module__sub-item">' + (dept ? dept.shortName : deptId) + '</span>';
+          });
+          html += '</div>';
+        }
+
+        trackResult.className = "track-result visible";
+        trackResult.innerHTML = html;
+      }
+
+      // Auto-track if URL has query param
+      var urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get("track")) {
+        trackInput.value = urlParams.get("track");
+        doTrack();
+        setTimeout(function () {
+          document.getElementById("track-section").scrollIntoView({ behavior: "smooth" });
+        }, 300);
       }
     });
   </script>

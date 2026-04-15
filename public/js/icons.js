@@ -150,6 +150,126 @@ const Icons = {
     svg.innerHTML = `<path d="M8 6v6"/><path d="M15 6v6"/><path d="M2 12h19.6"/><path d="M18 18h3s.5-1.7.8-2.8c.1-.4.2-.8.2-1.2 0-.4-.1-.8-.2-1.2l-1.4-5C20.1 6.8 19.1 6 18 6H4a2 2 0 0 0-2 2v10h3"/><circle cx="7" cy="18" r="2"/><path d="M9 18h5"/><circle cx="16" cy="18" r="2"/>`;
     return svg;
   },
+
+  mapPin(size = 24) {
+    const svg = this._svg(size);
+    svg.innerHTML = `<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>`;
+    return svg;
+  },
+
+  mail(size = 24) {
+    const svg = this._svg(size);
+    svg.innerHTML = `<rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>`;
+    return svg;
+  },
+
+  clock(size = 24) {
+    const svg = this._svg(size);
+    svg.innerHTML = `<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>`;
+    return svg;
+  },
+
+  chevronDown(size = 24) {
+    const svg = this._svg(size);
+    svg.innerHTML = `<path d="m6 9 6 6 6-6"/>`;
+    return svg;
+  },
+
+  chevronRight(size = 24) {
+    const svg = this._svg(size);
+    svg.innerHTML = `<path d="m9 18 6-6-6-6"/>`;
+    return svg;
+  },
+
+  check(size = 24) {
+    const svg = this._svg(size);
+    svg.innerHTML = `<path d="M20 6 9 17l-5-5"/>`;
+    return svg;
+  },
+
+  x(size = 24) {
+    const svg = this._svg(size);
+    svg.innerHTML = `<path d="M18 6 6 18"/><path d="m6 6 12 12"/>`;
+    return svg;
+  },
+
+  plus(size = 24) {
+    const svg = this._svg(size);
+    svg.innerHTML = `<path d="M5 12h14"/><path d="M12 5v14"/>`;
+    return svg;
+  },
+
+  barChart(size = 24) {
+    const svg = this._svg(size);
+    svg.innerHTML = `<line x1="12" x2="12" y1="20" y2="10"/><line x1="18" x2="18" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="16"/>`;
+    return svg;
+  },
+
+  users(size = 24) {
+    const svg = this._svg(size);
+    svg.innerHTML = `<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>`;
+    return svg;
+  },
+
+  settings(size = 24) {
+    const svg = this._svg(size);
+    svg.innerHTML = `<path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/>`;
+    return svg;
+  },
+
+  eye(size = 24) {
+    const svg = this._svg(size);
+    svg.innerHTML = `<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>`;
+    return svg;
+  },
+
+  send(size = 24) {
+    const svg = this._svg(size);
+    svg.innerHTML = `<path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/>`;
+    return svg;
+  },
+
+  star(size = 24) {
+    const svg = this._svg(size);
+    svg.innerHTML = `<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>`;
+    return svg;
+  },
+
+  target(size = 24) {
+    const svg = this._svg(size);
+    svg.innerHTML = `<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>`;
+    return svg;
+  },
+
+  globe(size = 24) {
+    const svg = this._svg(size);
+    svg.innerHTML = `<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>`;
+    return svg;
+  },
+
+  logOut(size = 24) {
+    const svg = this._svg(size);
+    svg.innerHTML = `<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/>`;
+    return svg;
+  },
+
+  clipboardList(size = 24) {
+    const svg = this._svg(size);
+    svg.innerHTML = `<rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/>`;
+    return svg;
+  },
+
+  activity(size = 24) {
+    const svg = this._svg(size);
+    svg.innerHTML = `<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>`;
+    return svg;
+  },
+
+  externalLink(size = 24) {
+    const svg = this._svg(size);
+    svg.innerHTML = `<path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>`;
+    return svg;
+  },
 };
 
 /* Helper: creates an icon SVG and optionally adds fill + class */

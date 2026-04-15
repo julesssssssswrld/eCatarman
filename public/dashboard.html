@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard | eCatarman Admin</title>
+  <meta name="description" content="eCatarman Admin Dashboard — Unified department management and service request processing">
+  <link rel="icon" href="/favicon.ico">
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body class="admin-body">
+
+  <!-- Sidebar -->
+  <aside class="admin-sidebar" id="admin-sidebar">
+    <div class="admin-sidebar__header">
+      <a href="/" class="admin-sidebar__logo">e<span>Catarman</span></a>
+      <span class="admin-sidebar__badge">Admin</span>
+    </div>
+
+    <nav class="admin-sidebar__nav">
+      <a href="/dashboard" class="admin-sidebar__link active" id="nav-dashboard">
+        <span class="admin-sidebar__link-icon" id="nav-icon-dashboard"></span>
+        <span>Dashboard</span>
+      </a>
+      <a href="#" class="admin-sidebar__link" id="nav-requests" data-view="requests">
+        <span class="admin-sidebar__link-icon" id="nav-icon-requests"></span>
+        <span>All Requests</span>
+        <span class="admin-sidebar__count" id="nav-count-requests"></span>
+      </a>
+      <a href="#" class="admin-sidebar__link" id="nav-departments" data-view="departments">
+        <span class="admin-sidebar__link-icon" id="nav-icon-departments"></span>
+        <span>Departments</span>
+      </a>
+    </nav>
+
+    <div class="admin-sidebar__footer">
+      <button class="admin-sidebar__logout" id="logout-btn">
+        <span id="logout-icon"></span>
+        <span>Sign Out</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="admin-main">
+
+    <!-- Top Bar -->
+    <header class="admin-topbar">
+      <div>
+        <h1 class="admin-topbar__title" id="page-title">Dashboard Overview</h1>
+        <p class="admin-topbar__sub" id="page-sub">Unified view of all service requests and department activity.</p>
+      </div>
+      <div class="admin-topbar__right">
+        <div class="admin-topbar__user">
+          <div class="admin-topbar__avatar" id="user-avatar"></div>
+          <div>
+            <div class="admin-topbar__name">Administrator</div>
+            <div class="admin-topbar__role">System Admin</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Dashboard View -->
+    <div class="admin-view" id="view-dashboard">
+
+      <!-- Stats Row -->
+      <div class="admin-stats" id="stats-row">
+        <!-- Rendered by JS -->
+      </div>
+
+      <!-- Charts & Recent -->
+      <div class="admin-grid-2col">
+
+        <!-- Requests by Status -->
+        <div class="admin-card">
+          <h3 class="admin-card__title">Requests by Status</h3>
+          <div class="admin-chart" id="status-chart"></div>
+        </div>
+
+        <!-- Requests by Department -->
+        <div class="admin-card">
+          <h3 class="admin-card__title">Requests by Department</h3>
+          <div class="admin-chart" id="dept-chart"></div>
+        </div>
+      </div>
+
+      <!-- Recent Requests Table -->
+      <div class="admin-card">
+        <div class="admin-card__header">
+          <h3 class="admin-card__title">Recent Service Requests</h3>
+          <button class="admin-card__action" id="view-all-btn">View All →</button>
+        </div>
+        <div class="admin-table-wrap">
+          <table class="admin-table" id="recent-table">
+            <thead>
+              <tr>
+                <th>Transaction ID</th>
+                <th>Citizen</th>
+                <th>Service</th>
+                <th>Department</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="recent-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- All Requests View -->
+    <div class="admin-view" id="view-requests" style="display:none;">
+      <div class="admin-card">
+        <div class="admin-card__header">
+          <h3 class="admin-card__title">All Service Requests</h3>
+          <div class="admin-filter-row">
+            <select class="admin-filter-select" id="filter-status">
+              <option value="">All Statuses</option>
+              <option value="Received">Received</option>
+              <option value="Under Review">Under Review</option>
+              <option value="Processing">Processing</option>
+              <option value="For Release">For Release</option>
+              <option value="Completed">Completed</option>
+            </select>
+            <select class="admin-filter-select" id="filter-dept">
+              <option value="">All Departments</option>
+            </select>
+          </div>
+        </div>
+        <div class="admin-table-wrap">
+          <table class="admin-table" id="all-table">
+            <thead>
+              <tr>
+                <th>Transaction ID</th>
+                <th>Citizen</th>
+                <th>Service</th>
+                <th>Department</th>
+                <th>Status</th>
+                <th>Routed To</th>
+                <th>Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="all-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Departments View -->
+    <div class="admin-view" id="view-departments" style="display:none;">
+      <div class="admin-dept-grid" id="admin-dept-grid">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Request Detail Modal -->
+  <div class="modal-overlay" id="detail-modal">
+    <div class="modal" style="max-width:42rem;">
+      <div class="modal__header">
+        <h2 class="modal__title" id="detail-title">Request Details</h2>
+        <button class="modal__close" id="detail-close"></button>
+      </div>
+      <div class="modal__body" id="detail-body"></div>
+    </div>
+  </div>
+
+  <script src="/js/icons.js"></script>
+  <script src="/js/data.js"></script>
+  <script>
+    // Auth check
+    if (!eCatarman.isLoggedIn()) {
+      window.location.href = "/admin";
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      /* ================================================================
+         SIDEBAR ICONS
+         ================================================================ */
+      document.getElementById("nav-icon-dashboard").appendChild(createIcon("barChart", 20));
+      document.getElementById("nav-icon-requests").appendChild(createIcon("clipboardList", 20));
+      document.getElementById("nav-icon-departments").appendChild(createIcon("building", 20));
+      document.getElementById("logout-icon").appendChild(createIcon("logOut", 18));
+      document.getElementById("user-avatar").appendChild(createIcon("user", 20));
+      document.getElementById("detail-close").appendChild(createIcon("x", 20));
+
+      /* ================================================================
+         LOGOUT
+         ================================================================ */
+      document.getElementById("logout-btn").addEventListener("click", function () {
+        eCatarman.logout();
+        window.location.href = "/admin";
+      });
+
+      /* ================================================================
+         VIEW SWITCHING
+         ================================================================ */
+      var views = { dashboard: "view-dashboard", requests: "view-requests", departments: "view-departments" };
+      var navLinks = document.querySelectorAll(".admin-sidebar__link[data-view]");
+      var dashLink = document.getElementById("nav-dashboard");
+
+      function showView(viewName) {
+        Object.values(views).forEach(function (id) {
+          document.getElementById(id).style.display = "none";
+        });
+        document.getElementById(views[viewName]).style.display = "block";
+
+        document.querySelectorAll(".admin-sidebar__link").forEach(function (l) { l.classList.remove("active"); });
+
+        if (viewName === "dashboard") {
+          dashLink.classList.add("active");
+          document.getElementById("page-title").textContent = "Dashboard Overview";
+          document.getElementById("page-sub").textContent = "Unified view of all service requests and department activity.";
+        } else if (viewName === "requests") {
+          document.getElementById("nav-requests").classList.add("active");
+          document.getElementById("page-title").textContent = "Service Requests";
+          document.getElementById("page-sub").textContent = "Manage, filter, and route all citizen service requests.";
+          renderAllRequests();
+        } else if (viewName === "departments") {
+          document.getElementById("nav-departments").classList.add("active");
+          document.getElementById("page-title").textContent = "Department Modules";
+          document.getElementById("page-sub").textContent = "9 modular departments — each independent, all integrated.";
+          renderDepartments();
+        }
+      }
+
+      navLinks.forEach(function (link) {
+        link.addEventListener("click", function (e) {
+          e.preventDefault();
+          showView(link.dataset.view);
+        });
+      });
+
+      dashLink.addEventListener("click", function (e) {
+        e.preventDefault();
+        showView("dashboard");
+      });
+
+      document.getElementById("view-all-btn").addEventListener("click", function () {
+        showView("requests");
+      });
+
+      /* ================================================================
+         RENDER DASHBOARD
+         ================================================================ */
+      function renderDashboard() {
+        var analytics = eCatarman.getAnalytics();
+
+        // Stats row
+        var statsRow = document.getElementById("stats-row");
+        statsRow.innerHTML = "";
+
+        var statItems = [
+          { label: "Total Requests", value: analytics.total, icon: "clipboardList", color: "teal" },
+          { label: "Pending", value: (analytics.byStatus["Received"] || 0) + (analytics.byStatus["Under Review"] || 0), icon: "clock", color: "amber" },
+          { label: "Processing", value: analytics.byStatus["Processing"] || 0, icon: "activity", color: "blue" },
+          { label: "Completed", value: analytics.byStatus["Completed"] || 0, icon: "check", color: "emerald" },
+        ];
+
+        statItems.forEach(function (s) {
+          var card = document.createElement("div");
+          card.className = "admin-stat-card";
+          card.innerHTML =
+            '<div class="admin-stat-card__icon ' + s.color + '"></div>' +
+            '<div class="admin-stat-card__value">' + s.value + '</div>' +
+            '<div class="admin-stat-card__label">' + s.label + '</div>';
+          card.querySelector(".admin-stat-card__icon").appendChild(createIcon(s.icon, 22));
+          statsRow.appendChild(card);
+        });
+
+        // Request count badge
+        document.getElementById("nav-count-requests").textContent = analytics.total;
+
+        // Status chart (bar chart)
+        var statusChart = document.getElementById("status-chart");
+        statusChart.innerHTML = "";
+        var maxStatus = Math.max.apply(null, Object.values(analytics.byStatus).concat([1]));
+        Object.keys(analytics.byStatus).forEach(function (status) {
+          var count = analytics.byStatus[status];
+          var color = eCatarman.STATUS_COLORS[status] || "blue";
+          var pct = Math.round((count / maxStatus) * 100);
+          var row = document.createElement("div");
+          row.className = "chart-bar-row";
+          row.innerHTML =
+            '<span class="chart-bar-label">' + status + '</span>' +
+            '<div class="chart-bar-track"><div class="chart-bar-fill ' + color + '" style="width:' + pct + '%"></div></div>' +
+            '<span class="chart-bar-value">' + count + '</span>';
+          statusChart.appendChild(row);
+        });
+
+        // Department chart
+        var deptChart = document.getElementById("dept-chart");
+        deptChart.innerHTML = "";
+        var maxDept = Math.max.apply(null, Object.values(analytics.byDept).concat([1]));
+        eCatarman.departments.forEach(function (dept) {
+          var count = analytics.byDept[dept.id] || 0;
+          var pct = Math.round((count / maxDept) * 100);
+          var row = document.createElement("div");
+          row.className = "chart-bar-row";
+          row.innerHTML =
+            '<span class="chart-bar-label">' + dept.shortName + '</span>' +
+            '<div class="chart-bar-track"><div class="chart-bar-fill teal" style="width:' + pct + '%"></div></div>' +
+            '<span class="chart-bar-value">' + count + '</span>';
+          deptChart.appendChild(row);
+        });
+
+        // Recent requests table
+        renderRecentRequests();
+      }
+
+      function renderRecentRequests() {
+        var tbody = document.getElementById("recent-tbody");
+        tbody.innerHTML = "";
+        var requests = eCatarman.getRequests().slice().reverse().slice(0, 6);
+        requests.forEach(function (r) { tbody.appendChild(createRequestRow(r, false)); });
+      }
+
+      /* ================================================================
+         RENDER ALL REQUESTS
+         ================================================================ */
+      function renderAllRequests() {
+        var tbody = document.getElementById("all-tbody");
+        tbody.innerHTML = "";
+        var statusFilter = document.getElementById("filter-status").value;
+        var deptFilter = document.getElementById("filter-dept").value;
+
+        var requests = eCatarman.getRequests().slice().reverse();
+        if (statusFilter) requests = requests.filter(function (r) { return r.status === statusFilter; });
+        if (deptFilter) requests = requests.filter(function (r) { return r.departmentId === deptFilter; });
+
+        requests.forEach(function (r) { tbody.appendChild(createRequestRow(r, true)); });
+      }
+
+      document.getElementById("filter-status").addEventListener("change", renderAllRequests);
+      document.getElementById("filter-dept").addEventListener("change", renderAllRequests);
+
+      // Populate dept filter
+      var deptSelect = document.getElementById("filter-dept");
+      eCatarman.departments.forEach(function (d) {
+        var opt = document.createElement("option");
+        opt.value = d.id;
+        opt.textContent = d.shortName;
+        deptSelect.appendChild(opt);
+      });
+
+      /* ================================================================
+         REQUEST ROW HELPER
+         ================================================================ */
+      function createRequestRow(r, showRouted) {
+        var tr = document.createElement("tr");
+        var statusColor = eCatarman.STATUS_COLORS[r.status] || "blue";
+        var dept = eCatarman.departments.find(function (d) { return d.id === r.departmentId; });
+
+        var html = '<td class="admin-table__txn">' + r.id + '</td>';
+        html += '<td>' + r.citizenName + '</td>';
+        html += '<td>' + r.serviceName + '</td>';
+        html += '<td>' + (dept ? dept.shortName : r.departmentId) + '</td>';
+        html += '<td><span class="status-badge status-badge--' + statusColor + '">' + r.status + '</span></td>';
+        if (showRouted) {
+          var routed = r.routedTo.map(function (rid) {
+            var rd = eCatarman.departments.find(function (d) { return d.id === rid; });
+            return rd ? rd.shortName : rid;
+          }).join(", ");
+          html += '<td>' + (routed || "—") + '</td>';
+        }
+        html += '<td>' + eCatarman.timeAgo(r.submittedAt) + '</td>';
+        html += '<td><button class="admin-table__action-btn" data-txn="' + r.id + '">Manage</button></td>';
+
+        tr.innerHTML = html;
+        tr.querySelector(".admin-table__action-btn").addEventListener("click", function () {
+          openDetailModal(r.id);
+        });
+        return tr;
+      }
+
+      /* ================================================================
+         RENDER DEPARTMENTS
+         ================================================================ */
+      function renderDepartments() {
+        var grid = document.getElementById("admin-dept-grid");
+        grid.innerHTML = "";
+        var analytics = eCatarman.getAnalytics();
+
+        eCatarman.departments.forEach(function (dept) {
+          var count = analytics.byDept[dept.id] || 0;
+          var card = document.createElement("div");
+          card.className = "admin-dept-card";
+
+          card.innerHTML =
+            '<div class="admin-dept-card__header">' +
+              '<div class="admin-dept-card__icon ' + dept.color + '"></div>' +
+              '<div class="admin-dept-card__status-dot"></div>' +
+            '</div>' +
+            '<h4 class="admin-dept-card__name">' + dept.shortName + '</h4>' +
+            '<p class="admin-dept-card__full">' + dept.name + '</p>' +
+            '<div class="admin-dept-card__stats">' +
+              '<div class="admin-dept-card__stat"><span class="admin-dept-card__stat-val">' + count + '</span><span class="admin-dept-card__stat-label">Requests</span></div>' +
+              '<div class="admin-dept-card__stat"><span class="admin-dept-card__stat-val">' + dept.email.split("@")[0] + '</span><span class="admin-dept-card__stat-label">Module ID</span></div>' +
+            '</div>' +
+            '<div class="admin-dept-card__meta">' +
+              '<div class="admin-dept-card__row"></div>' +
+              (dept.phone ? '<div class="admin-dept-card__row"></div>' : '') +
+            '</div>';
+
+          var icon = card.querySelector(".admin-dept-card__icon");
+          icon.appendChild(createIcon(dept.icon, 24));
+
+          var rows = card.querySelectorAll(".admin-dept-card__row");
+          if (rows[0]) {
+            rows[0].appendChild(createIcon("mail", 14));
+            var emailSpan = document.createElement("span");
+            emailSpan.textContent = dept.email;
+            rows[0].appendChild(emailSpan);
+          }
+          if (rows[1] && dept.phone) {
+            rows[1].appendChild(createIcon("phoneCall", 14));
+            var phoneSpan = document.createElement("span");
+            phoneSpan.textContent = dept.phone;
+            rows[1].appendChild(phoneSpan);
+          }
+
+          grid.appendChild(card);
+        });
+      }
+
+      /* ================================================================
+         REQUEST DETAIL MODAL
+         ================================================================ */
+      var detailModal = document.getElementById("detail-modal");
+      document.getElementById("detail-close").addEventListener("click", function () {
+        detailModal.classList.remove("active");
+      });
+      detailModal.addEventListener("click", function (e) {
+        if (e.target === detailModal) detailModal.classList.remove("active");
+      });
+
+      function openDetailModal(txnId) {
+        var r = eCatarman.getRequestById(txnId);
+        if (!r) return;
+
+        document.getElementById("detail-title").textContent = r.id;
+        var body = document.getElementById("detail-body");
+
+        var statusColor = eCatarman.STATUS_COLORS[r.status] || "blue";
+        var dept = eCatarman.departments.find(function (d) { return d.id === r.departmentId; });
+
+        var html = '<div class="track-result__header">';
+        html += '<span class="track-result__txn">' + r.id + '</span>';
+        html += '<span class="status-badge status-badge--' + statusColor + '">' + r.status + '</span>';
+        html += '</div>';
+
+        html += '<div class="track-result__details">';
+        html += '<div class="track-detail"><div class="track-detail__label">Service</div><div class="track-detail__value">' + r.serviceName + '</div></div>';
+        html += '<div class="track-detail"><div class="track-detail__label">Department</div><div class="track-detail__value">' + (dept ? dept.shortName : r.departmentId) + '</div></div>';
+        html += '<div class="track-detail"><div class="track-detail__label">Citizen</div><div class="track-detail__value">' + r.citizenName + '</div></div>';
+        html += '<div class="track-detail"><div class="track-detail__label">Email</div><div class="track-detail__value">' + (r.citizenEmail || "—") + '</div></div>';
+        html += '<div class="track-detail"><div class="track-detail__label">Submitted</div><div class="track-detail__value">' + eCatarman.formatDateTime(r.submittedAt) + '</div></div>';
+        html += '<div class="track-detail"><div class="track-detail__label">Last Updated</div><div class="track-detail__value">' + eCatarman.formatDateTime(r.updatedAt) + '</div></div>';
+        html += '</div>';
+
+        // Application data
+        html += '<p class="svc-module__sub-title">Application Data</p>';
+        html += '<div class="track-result__details">';
+        Object.keys(r.formData).forEach(function (key) {
+          html += '<div class="track-detail"><div class="track-detail__label">' + key + '</div><div class="track-detail__value">' + (r.formData[key] || "—") + '</div></div>';
+        });
+        html += '</div>';
+
+        // Timeline
+        if (r.notes.length > 0) {
+          html += '<p class="svc-module__sub-title">Status Timeline</p>';
+          html += '<div class="track-timeline">';
+          r.notes.forEach(function (note) {
+            html += '<div class="track-timeline__item"><div class="track-timeline__dot"></div>';
+            html += '<div class="track-timeline__status">' + note.status + '</div>';
+            html += '<div class="track-timeline__note">' + note.text + '</div>';
+            html += '<div class="track-timeline__time">' + eCatarman.formatDateTime(note.timestamp) + '</div></div>';
+          });
+          html += '</div>';
+        }
+
+        // Cross-department routing info
+        if (r.routedTo.length > 0) {
+          html += '<p class="svc-module__sub-title">Cross-Department Routing</p>';
+          html += '<div class="svc-module__sub-list">';
+          r.routedTo.forEach(function (did) {
+            var rd = eCatarman.departments.find(function (d) { return d.id === did; });
+            html += '<span class="svc-module__sub-item">' + (rd ? rd.name : did) + '</span>';
+          });
+          html += '</div>';
+        }
+
+        // Update Status Actions
+        html += '<p class="svc-module__sub-title">Update Status</p>';
+        html += '<div class="admin-status-actions" id="status-actions">';
+        var statuses = ["Received", "Under Review", "Processing", "For Release", "Completed"];
+        statuses.forEach(function (s) {
+          var cls = s === r.status ? "admin-status-btn admin-status-btn--active" : "admin-status-btn";
+          html += '<button class="' + cls + '" data-status="' + s + '" data-txn="' + r.id + '">' + s + '</button>';
+        });
+        html += '</div>';
+
+        // Route to department
+        html += '<p class="svc-module__sub-title">Route to Department</p>';
+        html += '<div class="admin-route-row">';
+        html += '<select class="admin-filter-select" id="route-dept-select">';
+        html += '<option value="">Select department...</option>';
+        eCatarman.departments.forEach(function (d) {
+          if (d.id !== r.departmentId) {
+            html += '<option value="' + d.id + '">' + d.shortName + ' — ' + d.name + '</option>';
+          }
+        });
+        html += '</select>';
+        html += '<button class="svc-module__btn svc-module__btn--apply" id="route-btn" data-txn="' + r.id + '" style="white-space:nowrap;">Route</button>';
+        html += '</div>';
+
+        // Add note
+        html += '<p class="svc-module__sub-title">Add Note</p>';
+        html += '<div class="admin-route-row">';
+        html += '<input type="text" class="form-input" id="note-input" placeholder="Enter a note for this request..." style="flex:1;">';
+        html += '<button class="svc-module__btn svc-module__btn--info" id="note-btn" data-txn="' + r.id + '" style="white-space:nowrap;">Add Note</button>';
+        html += '</div>';
+
+        body.innerHTML = html;
+
+        // Bind status buttons
+        body.querySelectorAll(".admin-status-btn").forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            var newStatus = btn.dataset.status;
+            var txn = btn.dataset.txn;
+            eCatarman.updateRequestStatus(txn, newStatus, "Status updated to " + newStatus);
+            openDetailModal(txn);
+            renderDashboard();
+          });
+        });
+
+        // Bind route button
+        var routeBtn = document.getElementById("route-btn");
+        if (routeBtn) {
+          routeBtn.addEventListener("click", function () {
+            var selectEl = document.getElementById("route-dept-select");
+            if (selectEl.value) {
+              eCatarman.routeRequest(routeBtn.dataset.txn, selectEl.value);
+              openDetailModal(routeBtn.dataset.txn);
+              renderDashboard();
+            }
+          });
+        }
+
+        // Bind note button
+        var noteBtn = document.getElementById("note-btn");
+        if (noteBtn) {
+          noteBtn.addEventListener("click", function () {
+            var noteInput = document.getElementById("note-input");
+            if (noteInput.value.trim()) {
+              var req = eCatarman.getRequestById(noteBtn.dataset.txn);
+              if (req) {
+                eCatarman.updateRequestStatus(noteBtn.dataset.txn, req.status, noteInput.value.trim());
+                openDetailModal(noteBtn.dataset.txn);
+              }
+            }
+          });
+        }
+
+        detailModal.classList.add("active");
+      }
+
+      /* ================================================================
+         INIT
+         ================================================================ */
+      renderDashboard();
+    });
+  </script>
+
+</body>
+</html>

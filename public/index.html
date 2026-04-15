@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Catarman Web Portal</title>
-  <meta name="description" content="Catarman Local Government centralized portal">
+  <title>eCatarman — Modular E-Governance Platform</title>
+  <meta name="description" content="Catarman Local Government centralized digital portal — services, governance, emergency, and community engagement.">
   <link rel="icon" href="/favicon.ico">
   <link rel="stylesheet" href="/css/styles.css">
 </head>
@@ -17,13 +17,17 @@
       <section class="hero">
         <div class="hero__bg"></div>
         <div class="hero__content">
-          <div class="hero__badge">HOME</div>
+          <div class="hero__badge">MODULAR E-GOVERNANCE</div>
           <h1 class="hero__title">
             Welcome to <span>eCatarman</span>
           </h1>
           <p class="hero__desc">
-            Your centralized portal for local government services, emergency assistance, and community updates. Fast, transparent, and accessible.
+            A centralized digital platform for Catarman, Northern Samar — connecting citizens to municipal services, emergency response, and transparent governance through modular software architecture.
           </p>
+          <div class="hero__actions">
+            <a href="/services" class="hero__btn hero__btn--primary" id="hero-btn-services"></a>
+            <a href="#about-section" class="hero__btn hero__btn--secondary" id="hero-btn-about"></a>
+          </div>
         </div>
       </section>
 
@@ -31,37 +35,16 @@
       <section>
         <div class="section-header">
           <div>
-            <h2 class="section-header__title">Essential Services</h2>
-            <p class="section-header__sub">Quick access to the most requested municipal services.</p>
+            <h2 class="section-header__title">Service Modules</h2>
+            <p class="section-header__sub">Six integrated LGU service modules — each self-contained, all connected.</p>
           </div>
           <a href="/services" class="view-all-link">
-            View all directory
+            View all services
             <svg class="arrow-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
           </a>
         </div>
-        <div class="services-grid">
-
-          <!-- e-Permits -->
-          <a href="/services" class="service-card">
-            <div class="service-card__icon blue" id="icon-permits"></div>
-            <h3 class="service-card__title">e-Permits</h3>
-            <p class="service-card__desc">Business, Building &amp; Occupational Permits</p>
-          </a>
-
-          <!-- Health & Medical -->
-          <a href="/services" class="service-card">
-            <div class="service-card__icon rose" id="icon-health"></div>
-            <h3 class="service-card__title">Health &amp; Medical</h3>
-            <p class="service-card__desc">Financial Assistance &amp; Medical Certificates</p>
-          </a>
-
-          <!-- Civil Registry -->
-          <a href="/services" class="service-card">
-            <div class="service-card__icon purple" id="icon-civil"></div>
-            <h3 class="service-card__title">Civil Registry</h3>
-            <p class="service-card__desc">Birth, Marriage, Death Records</p>
-          </a>
-
+        <div class="services-grid services-grid--6" id="home-services-grid">
+          <!-- Rendered by JS from data.js -->
         </div>
       </section>
 
@@ -71,27 +54,27 @@
         <!-- Governance Card -->
         <div class="governance-card">
           <div class="governance-card__icon-wrap" id="icon-building"></div>
-          <h3 class="governance-card__title">Good Governance</h3>
+          <h3 class="governance-card__title">Resources & Forms</h3>
           <p class="governance-card__desc">
-            Access public financial records, municipal ordinances, and ongoing infrastructure projects to see how Catarman is growing.
+            Download official application forms and documentary checklists from municipal departments. Prepare your requirements before visiting the office.
           </p>
           <div class="transparency-grid">
-            <div class="transparency-link">
-              <span class="transparency-link__text">Annual LGU Budget</span>
+            <a href="https://catarman.gov.ph/files/resources/obo/Unified%20Application%20For%20Building%20Permit.pdf" target="_blank" class="transparency-link">
+              <span class="transparency-link__text">Building Permit Form</span>
               <span class="transparency-link__arrow" id="arrow-1"></span>
-            </div>
-            <div class="transparency-link">
-              <span class="transparency-link__text">Bids and Awards</span>
+            </a>
+            <a href="https://catarman.gov.ph/files/resources/zoning/Application%20for%20Locational%20Clearance.pdf" target="_blank" class="transparency-link">
+              <span class="transparency-link__text">Locational Clearance Form</span>
               <span class="transparency-link__arrow" id="arrow-2"></span>
-            </div>
-            <div class="transparency-link">
-              <span class="transparency-link__text">Executive Orders</span>
+            </a>
+            <a href="https://catarman.gov.ph/files/resources/realty%20property/Checklist%20of%20Documentary%20Requirements%20%28CDR%29.pdf" target="_blank" class="transparency-link">
+              <span class="transparency-link__text">Property CDR Checklist</span>
               <span class="transparency-link__arrow" id="arrow-3"></span>
-            </div>
-            <div class="transparency-link">
-              <span class="transparency-link__text">Legislative Ordinances</span>
+            </a>
+            <a href="https://catarman.gov.ph/files/resources/obo/Electrical%20Permit.pdf" target="_blank" class="transparency-link">
+              <span class="transparency-link__text">Electrical Permit Form</span>
               <span class="transparency-link__arrow" id="arrow-4"></span>
-            </div>
+            </a>
           </div>
         </div>
 
@@ -110,35 +93,246 @@
 
       </section>
 
+      <!-- ════════════════════════════════════════════════════════════════
+           ABOUT CATARMAN SECTION
+           ════════════════════════════════════════════════════════════════ -->
+      <section class="about-section" id="about-section">
+        <div class="section-header">
+          <div>
+            <h2 class="section-header__title">About Catarman</h2>
+            <p class="section-header__sub">Capital and economic center of Northern Samar</p>
+          </div>
+        </div>
+
+        <div class="about-grid">
+          <!-- About Main -->
+          <div class="about-main-card">
+            <p class="about-main-card__text" id="about-desc"></p>
+            <p class="about-main-card__text about-main-card__text--secondary" id="about-geo"></p>
+          </div>
+
+          <!-- Stats Cards -->
+          <div class="about-stats-grid">
+            <div class="stat-card">
+              <div class="stat-card__icon teal" id="stat-icon-1"></div>
+              <div class="stat-card__value">55</div>
+              <div class="stat-card__label">Barangays</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card__icon blue" id="stat-icon-2"></div>
+              <div class="stat-card__value">46,443</div>
+              <div class="stat-card__label">Hectares</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card__icon emerald" id="stat-icon-3"></div>
+              <div class="stat-card__value">22</div>
+              <div class="stat-card__label">Urban Barangays</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card__icon purple" id="stat-icon-4"></div>
+              <div class="stat-card__value">33</div>
+              <div class="stat-card__label">Rural Barangays</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mission & Vision -->
+        <div class="mv-grid">
+          <div class="mv-card mv-card--mission">
+            <div class="mv-card__icon-wrap" id="mv-icon-1"></div>
+            <h3 class="mv-card__title">Our Mission</h3>
+            <p class="mv-card__text" id="mission-text"></p>
+          </div>
+          <div class="mv-card mv-card--vision">
+            <div class="mv-card__icon-wrap" id="mv-icon-2"></div>
+            <h3 class="mv-card__title">Our Vision</h3>
+            <p class="mv-card__text" id="vision-text"></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════════════════════════════
+           DEPARTMENT DIRECTORY (GOVERNANCE)
+           ════════════════════════════════════════════════════════════════ -->
+      <section id="governance-section">
+        <div class="section-header">
+          <div>
+            <h2 class="section-header__title">Department Directory</h2>
+            <p class="section-header__sub">9 integrated department modules powering Catarman's digital governance.</p>
+          </div>
+        </div>
+        <div class="dept-grid" id="dept-grid">
+          <!-- Rendered by JS -->
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════════════════════════════
+           CONTACT DIRECTORY
+           ════════════════════════════════════════════════════════════════ -->
+      <section id="contact-section">
+        <div class="section-header">
+          <div>
+            <h2 class="section-header__title">Contact Directory</h2>
+            <p class="section-header__sub">Reach any municipal office directly.</p>
+          </div>
+        </div>
+        <div class="contact-grid" id="contact-grid">
+          <!-- Rendered by JS -->
+        </div>
+      </section>
+
     </div>
   </main>
 
   <script src="/js/icons.js"></script>
+  <script src="/js/data.js"></script>
   <script src="/js/navigation.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", function () {
-      // Service card icons
-      document.getElementById("icon-permits").appendChild(createIcon("fileText", 28));
-      document.getElementById("icon-health").appendChild(createIcon("heartPulse", 28));
-      document.getElementById("icon-civil").appendChild(createIcon("shieldCheck", 28));
 
-      // Building icon
+      /* ---- Hero Buttons ---- */
+      var servicesBtn = document.getElementById("hero-btn-services");
+      servicesBtn.appendChild(createIcon("layoutGrid", 20));
+      servicesBtn.appendChild(document.createTextNode(" Explore Services"));
+
+      var aboutBtn = document.getElementById("hero-btn-about");
+      aboutBtn.appendChild(createIcon("info", 20));
+      aboutBtn.appendChild(document.createTextNode(" About Catarman"));
+      aboutBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        document.getElementById("about-section").scrollIntoView({ behavior: "smooth" });
+      });
+
+      /* ---- Service Modules Grid (from data.js) ---- */
+      var grid = document.getElementById("home-services-grid");
+      var colorMap = { teal: "teal", purple: "purple", amber: "amber", indigo: "indigo", emerald: "emerald", blue: "blue", rose: "rose" };
+      var iconColorClasses = {
+        teal: "teal", purple: "purple", amber: "amber",
+        indigo: "indigo", emerald: "emerald", blue: "blue", rose: "rose"
+      };
+
+      eCatarman.services.forEach(function (svc) {
+        var card = document.createElement("a");
+        card.href = "/services#" + svc.id;
+        card.className = "service-card";
+
+        var iconWrap = document.createElement("div");
+        iconWrap.className = "service-card__icon " + (iconColorClasses[svc.color] || "teal");
+        iconWrap.appendChild(createIcon(svc.icon, 28));
+
+        var title = document.createElement("h3");
+        title.className = "service-card__title";
+        title.textContent = svc.name;
+
+        var desc = document.createElement("p");
+        desc.className = "service-card__desc";
+        desc.textContent = svc.description;
+
+        card.appendChild(iconWrap);
+        card.appendChild(title);
+        card.appendChild(desc);
+        grid.appendChild(card);
+      });
+
+      /* ---- Building icon ---- */
       document.getElementById("icon-building").appendChild(createIcon("building", 28));
 
-      // Transparency arrows
-      for (let i = 1; i <= 4; i++) {
+      /* ---- Transparency arrows ---- */
+      for (var i = 1; i <= 4; i++) {
         document.getElementById("arrow-" + i).appendChild(createIcon("arrowRight", 18));
       }
 
-      // Emergency CTA button
-      const emergencyBtn = document.getElementById("emergency-btn");
-      const phoneIcon = createIcon("phoneCall", 22, { filled: true });
-      emergencyBtn.appendChild(phoneIcon);
+      /* ---- Emergency CTA button ---- */
+      var emergencyBtn = document.getElementById("emergency-btn");
+      emergencyBtn.appendChild(createIcon("phoneCall", 22, { filled: true }));
       emergencyBtn.appendChild(document.createTextNode(" Call Hotlines"));
 
-      // Background phone icon
-      const bgPhone = createIcon("phoneCall", 240, { filled: true });
+      var bgPhone = createIcon("phoneCall", 240, { filled: true });
       document.getElementById("bg-phone-icon").appendChild(bgPhone);
+
+      /* ---- About Section ---- */
+      document.getElementById("about-desc").textContent = eCatarman.about.description;
+      document.getElementById("about-geo").textContent = eCatarman.about.geography;
+      document.getElementById("mission-text").textContent = eCatarman.about.mission;
+      document.getElementById("vision-text").textContent = eCatarman.about.vision;
+
+      document.getElementById("stat-icon-1").appendChild(createIcon("mapPin", 22));
+      document.getElementById("stat-icon-2").appendChild(createIcon("globe", 22));
+      document.getElementById("stat-icon-3").appendChild(createIcon("building", 22));
+      document.getElementById("stat-icon-4").appendChild(createIcon("target", 22));
+      document.getElementById("mv-icon-1").appendChild(createIcon("target", 24));
+      document.getElementById("mv-icon-2").appendChild(createIcon("star", 24));
+
+      /* ---- Department Directory ---- */
+      var deptGrid = document.getElementById("dept-grid");
+      eCatarman.departments.forEach(function (dept) {
+        var card = document.createElement("div");
+        card.className = "dept-card";
+
+        var iconWrap = document.createElement("div");
+        iconWrap.className = "dept-card__icon " + dept.color;
+        iconWrap.appendChild(createIcon(dept.icon, 24));
+
+        var name = document.createElement("h4");
+        name.className = "dept-card__name";
+        name.textContent = dept.shortName;
+
+        var fullName = document.createElement("p");
+        fullName.className = "dept-card__full-name";
+        fullName.textContent = dept.name;
+
+        var emailRow = document.createElement("div");
+        emailRow.className = "dept-card__row";
+        emailRow.appendChild(createIcon("mail", 14));
+        var emailText = document.createElement("span");
+        emailText.textContent = dept.email;
+        emailRow.appendChild(emailText);
+
+        card.appendChild(iconWrap);
+        card.appendChild(name);
+        card.appendChild(fullName);
+        card.appendChild(emailRow);
+
+        if (dept.phone) {
+          var phoneRow = document.createElement("div");
+          phoneRow.className = "dept-card__row";
+          phoneRow.appendChild(createIcon("phoneCall", 14));
+          var phoneText = document.createElement("span");
+          phoneText.textContent = dept.phone;
+          phoneRow.appendChild(phoneText);
+          card.appendChild(phoneRow);
+        }
+
+        deptGrid.appendChild(card);
+      });
+
+      /* ---- Contact Directory ---- */
+      var contactGrid = document.getElementById("contact-grid");
+      eCatarman.contacts.forEach(function (c) {
+        var card = document.createElement("div");
+        card.className = "contact-card";
+
+        var iconWrap = document.createElement("div");
+        iconWrap.className = "contact-card__icon";
+        iconWrap.appendChild(createIcon("phoneCall", 18, { filled: true }));
+
+        var info = document.createElement("div");
+        info.className = "contact-card__info";
+
+        var office = document.createElement("h4");
+        office.className = "contact-card__office";
+        office.textContent = c.office;
+
+        var nums = document.createElement("p");
+        nums.className = "contact-card__num";
+        nums.textContent = c.phone + (c.landline ? " / " + c.landline : "");
+
+        info.appendChild(office);
+        info.appendChild(nums);
+        card.appendChild(iconWrap);
+        card.appendChild(info);
+        contactGrid.appendChild(card);
+      });
     });
   </script>
 
