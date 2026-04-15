@@ -321,14 +321,45 @@
             var p2 = document.createElement("p");
             p2.textContent = "Use this ID to track your request status anytime.";
 
+            var emailNotice = document.createElement("p");
+            emailNotice.style.cssText = "font-size:0.8125rem;color:var(--slate-400);font-weight:600;margin-top:0.75rem;";
+            emailNotice.textContent = result.citizenEmail ? "📧 Sending confirmation to " + result.citizenEmail + "..." : "";
+
             success.appendChild(iconWrap);
             success.appendChild(title);
             success.appendChild(p1);
             success.appendChild(txnId);
             success.appendChild(p2);
+            success.appendChild(emailNotice);
             body.appendChild(success);
 
             document.getElementById("modal-title").textContent = "Success";
+
+            // Send confirmation email via backend
+            if (result.citizenEmail) {
+              var dept = eCatarman.departments.find(function (d) { return d.id === result.departmentId; });
+              fetch("/api/email/submission", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  email: result.citizenEmail,
+                  citizenName: result.citizenName,
+                  serviceName: result.serviceName,
+                  deptName: dept ? dept.name : result.departmentId,
+                  txnId: result.id,
+                }),
+              })
+              .then(function (r) { return r.json(); })
+              .then(function (data) {
+                if (data.success || data.simulated) {
+                  emailNotice.textContent = "✅ Confirmation email sent to " + result.citizenEmail;
+                  emailNotice.style.color = "var(--emerald-600)";
+                }
+              })
+              .catch(function () {
+                emailNotice.textContent = "Email notification could not be sent.";
+              });
+            }
           }
         });
 

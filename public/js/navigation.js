@@ -39,16 +39,8 @@ function renderNavigation() {
     nav.appendChild(a);
   });
 
-  // Right side
-  const right = document.createElement("div");
-  right.className = "desktop-nav__right";
-  right.innerHTML = `
-    <a href="/admin" class="sign-in-btn">Sign In</a>
-  `;
-
   inner.appendChild(logoLink);
   inner.appendChild(nav);
-  inner.appendChild(right);
   header.appendChild(inner);
 
   /* ---- Mobile Bottom Nav ---- */
@@ -71,22 +63,33 @@ function renderNavigation() {
     mobileInner.appendChild(a);
   });  
 
-  // Account mobile link
-  const accountLink = document.createElement("a");
-  accountLink.href = "/account";
-  accountLink.className = "mobile-nav__link" + (currentPath === "/account" ? " active" : "");
-  accountLink.appendChild(createIcon("user", 20));
-  const accLabel = document.createElement("span");
-  accLabel.className = "mobile-nav__label";
-  accLabel.textContent = "Account";
-  accountLink.appendChild(accLabel);
-  mobileInner.appendChild(accountLink);
-
   mobileNav.appendChild(mobileInner);
+
+  /* ---- Site Footer ---- */
+  const footer = document.createElement("footer");
+  footer.className = "site-footer";
+  footer.innerHTML = `
+    <div class="site-footer__inner">
+      <div class="site-footer__brand">
+        <span class="site-footer__logo">e<span>Catarman</span></span>
+        <p class="site-footer__tagline">Modular E-Governance Platform</p>
+      </div>
+      <div class="site-footer__links">
+        <a href="/" class="site-footer__link">Home</a>
+        <a href="/services" class="site-footer__link">Services</a>
+        <a href="/emergency" class="site-footer__link">Emergency</a>
+      </div>
+      <div class="site-footer__bottom">
+        <p class="site-footer__copy">&copy; 2026 Municipality of Catarman, Northern Samar. All rights reserved.</p>
+        <a href="/admin" class="site-footer__admin-link">Staff Portal</a>
+      </div>
+    </div>
+  `;
 
   // Insert into DOM
   document.body.prepend(mobileNav);
   document.body.prepend(header);
+  document.body.appendChild(footer);
 }
 
 /* Client-side navigation handler */

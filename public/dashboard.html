@@ -527,9 +527,27 @@
         if (quickBtn) {
           quickBtn.addEventListener("click", function () {
             var next = quickBtn.dataset.next;
+            var reqData = eCatarman.getRequestById(quickBtn.dataset.txn);
             eCatarman.updateRequestStatus(quickBtn.dataset.txn, next, "Quick advanced to " + next);
             logActivity("Status Update", quickBtn.dataset.txn, "→ " + next);
             showToast(quickBtn.dataset.txn + " advanced to " + next, "success");
+
+            // Email citizen
+            if (reqData && reqData.citizenEmail) {
+              fetch("/api/email/status", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  email: reqData.citizenEmail,
+                  citizenName: reqData.citizenName,
+                  serviceName: reqData.serviceName,
+                  newStatus: next,
+                  txnId: quickBtn.dataset.txn,
+                  note: "Quick advanced to " + next,
+                }),
+              }).catch(function () {});
+            }
+
             renderDashboard();
             renderAllRequests();
           });
@@ -771,6 +789,23 @@
             eCatarman.updateRequestStatus(txn, newStatus, "Status updated to " + newStatus);
             logActivity("Status Update", txn, r.citizenName + " → " + newStatus);
             showToast("Status updated to " + newStatus, "success");
+
+            // Email citizen
+            if (r.citizenEmail) {
+              fetch("/api/email/status", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  email: r.citizenEmail,
+                  citizenName: r.citizenName,
+                  serviceName: r.serviceName,
+                  newStatus: newStatus,
+                  txnId: txn,
+                  note: "Status updated to " + newStatus,
+                }),
+              }).catch(function () {});
+            }
+
             openDetailModal(txn);
             renderDashboard();
           });
@@ -783,9 +818,27 @@
             var selectEl = document.getElementById("route-dept-select");
             if (selectEl.value) {
               var targetDept = eCatarman.departments.find(function (d) { return d.id === selectEl.value; });
+              var fromDept = eCatarman.departments.find(function (d) { return d.id === r.departmentId; });
               eCatarman.routeRequest(routeBtn.dataset.txn, selectEl.value);
               logActivity("Route", routeBtn.dataset.txn, "Routed to " + (targetDept ? targetDept.shortName : selectEl.value));
               showToast("Routed to " + (targetDept ? targetDept.shortName : selectEl.value), "success");
+
+              // Email citizen
+              if (r.citizenEmail) {
+                fetch("/api/email/route", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    email: r.citizenEmail,
+                    citizenName: r.citizenName,
+                    serviceName: r.serviceName,
+                    fromDept: fromDept ? fromDept.name : r.departmentId,
+                    toDept: targetDept ? targetDept.name : selectEl.value,
+                    txnId: routeBtn.dataset.txn,
+                  }),
+                }).catch(function () {});
+              }
+
               openDetailModal(routeBtn.dataset.txn);
               renderDashboard();
             }

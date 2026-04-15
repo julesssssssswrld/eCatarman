@@ -2748,3 +2748,91 @@ img {
   color: var(--teal-700);
   text-align: right;
 }
+
+/* ==========================================================================
+   SITE FOOTER
+   ========================================================================== */
+.site-footer {
+  background: var(--slate-900);
+  color: var(--slate-400);
+  padding: 3rem 1.5rem 2rem;
+  margin-top: 4rem;
+}
+@media (max-width: 767px) {
+  .site-footer {
+    padding-bottom: 5rem; /* clear mobile nav */
+  }
+}
+
+.site-footer__inner {
+  max-width: 72rem;
+  margin: 0 auto;
+}
+
+.site-footer__brand {
+  margin-bottom: 1.5rem;
+}
+
+.site-footer__logo {
+  font-size: 1.375rem;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: -0.025em;
+}
+.site-footer__logo span {
+  color: var(--teal-400);
+}
+
+.site-footer__tagline {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--slate-500);
+  margin-top: 0.375rem;
+}
+
+.site-footer__links {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 1.5rem;
+}
+
+.site-footer__link {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--slate-400);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.site-footer__link:hover {
+  color: var(--teal-400);
+}
+
+.site-footer__bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.site-footer__copy {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--slate-600);
+}
+
+/* Subtle admin link — blends with copyright text */
+.site-footer__admin-link {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: var(--slate-700);
+  text-decoration: none;
+  transition: color 0.3s;
+  letter-spacing: 0.025em;
+}
+.site-footer__admin-link:hover {
+  color: var(--slate-400);
+}
