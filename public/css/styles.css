@@ -2517,6 +2517,72 @@ img {
   }
 }
 
+/* Upload Dropzone */
+.upload-dropzone {
+  border: 2px dashed var(--slate-200);
+  border-radius: 1rem;
+  padding: 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.25s;
+  background: var(--slate-50);
+  margin-bottom: 0.75rem;
+}
+
+.upload-dropzone:hover,
+.upload-dropzone--active {
+  border-color: var(--teal-400);
+  background: var(--teal-50);
+}
+
+.upload-dropzone__inner {
+  pointer-events: none;
+}
+
+.upload-file-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.upload-file-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem 1rem;
+  background: #fff;
+  border: 1px solid var(--slate-200);
+  border-radius: 0.75rem;
+  transition: all 0.2s;
+}
+
+.upload-file-item:hover {
+  border-color: var(--teal-200);
+  background: var(--teal-50);
+}
+
+.upload-file-remove {
+  background: var(--red-50);
+  color: var(--red-500);
+  border: 1px solid var(--red-100);
+  border-radius: 0.5rem;
+  width: 1.75rem;
+  height: 1.75rem;
+  font-size: 1.125rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.upload-file-remove:hover {
+  background: var(--red-500);
+  color: #fff;
+}
+
 /* Success state */
 .modal__success {
   text-align: center;

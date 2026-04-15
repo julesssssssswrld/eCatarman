@@ -491,6 +491,100 @@
           });
         });
 
+        // ── Upload Requirements Section (optional) ──
+        var uploadSection = document.createElement("div");
+        uploadSection.className = "form-section-header";
+        uploadSection.textContent = "Upload Requirements (Optional)";
+        uploadSection.style.marginTop = "0.5rem";
+
+        var uploadDesc = document.createElement("p");
+        uploadDesc.style.cssText = "font-size:0.8125rem;color:var(--slate-500);font-weight:500;margin-bottom:1rem;";
+        uploadDesc.textContent = "Attach supporting documents such as IDs, birth certificates, tax declarations, or other requirements. Max 5 files, 10MB each. (PDF, JPG, PNG, DOCX)";
+
+        var uploadArea = document.createElement("div");
+        uploadArea.className = "upload-dropzone";
+        uploadArea.id = "upload-dropzone";
+        uploadArea.innerHTML = '<div class="upload-dropzone__inner">'
+          + '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--teal-400)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>'
+          + '<p style="font-weight:700;color:var(--slate-700);margin-top:0.5rem;">Drag & drop files here</p>'
+          + '<p style="font-size:0.75rem;color:var(--slate-400);">or click to browse</p>'
+          + '</div>';
+
+        var fileInput = document.createElement("input");
+        fileInput.type = "file";
+        fileInput.multiple = true;
+        fileInput.accept = ".pdf,.jpg,.jpeg,.png,.webp,.doc,.docx";
+        fileInput.style.display = "none";
+        fileInput.id = "upload-file-input";
+
+        var fileList = document.createElement("div");
+        fileList.className = "upload-file-list";
+        fileList.id = "upload-file-list";
+
+        var _selectedFiles = [];
+
+        uploadArea.addEventListener("click", function () { fileInput.click(); });
+        uploadArea.addEventListener("dragover", function (e) {
+          e.preventDefault();
+          uploadArea.classList.add("upload-dropzone--active");
+        });
+        uploadArea.addEventListener("dragleave", function () {
+          uploadArea.classList.remove("upload-dropzone--active");
+        });
+        uploadArea.addEventListener("drop", function (e) {
+          e.preventDefault();
+          uploadArea.classList.remove("upload-dropzone--active");
+          addFiles(e.dataTransfer.files);
+        });
+        fileInput.addEventListener("change", function () {
+          addFiles(fileInput.files);
+          fileInput.value = "";
+        });
+
+        function addFiles(newFiles) {
+          for (var i = 0; i < newFiles.length; i++) {
+            if (_selectedFiles.length >= 5) break;
+            var f = newFiles[i];
+            if (f.size > 10 * 1024 * 1024) {
+              alert(f.name + " exceeds 10MB limit.");
+              continue;
+            }
+            _selectedFiles.push(f);
+          }
+          renderFileList();
+        }
+
+        function renderFileList() {
+          fileList.innerHTML = "";
+          _selectedFiles.forEach(function (f, i) {
+            var item = document.createElement("div");
+            item.className = "upload-file-item";
+
+            var icon = f.type.startsWith("image/") ? "🖼️" : (f.type === "application/pdf" ? "📄" : "📎");
+            var sizeMB = (f.size / (1024 * 1024)).toFixed(2);
+
+            item.innerHTML = '<span style="font-size:1.25rem;">' + icon + '</span>'
+              + '<div style="flex:1;min-width:0;">'
+              + '  <p style="font-weight:700;font-size:0.8125rem;color:var(--slate-700);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + f.name + '</p>'
+              + '  <p style="font-size:0.6875rem;color:var(--slate-400);">' + sizeMB + ' MB</p>'
+              + '</div>'
+              + '<button type="button" class="upload-file-remove" data-idx="' + i + '" title="Remove">&times;</button>';
+
+            item.querySelector(".upload-file-remove").addEventListener("click", function () {
+              _selectedFiles.splice(i, 1);
+              renderFileList();
+            });
+
+            fileList.appendChild(item);
+          });
+        }
+
+        gatedContainer.appendChild(uploadSection);
+        gatedContainer.appendChild(uploadDesc);
+        gatedContainer.appendChild(uploadArea);
+        gatedContainer.appendChild(fileInput);
+        gatedContainer.appendChild(fileList);
+
         var submitBtn = document.createElement("button");
         submitBtn.type = "submit";
         submitBtn.className = "form-submit form-submit--disabled";
@@ -503,7 +597,7 @@
 
           // Validate all visible required fields
           var allValid = true;
-          form.querySelectorAll("input, select, textarea").forEach(function (el) {
+          form.querySelectorAll("input:not([type='file']), select, textarea").forEach(function (el) {
             var parentGroup = el.closest(".form-group");
             if (parentGroup && parentGroup.style.display === "none") return; // skip hidden
             if (!el.checkValidity()) {
@@ -524,6 +618,10 @@
             return;
           }
 
+          // Disable submit button during processing
+          submitBtn.disabled = true;
+          submitBtn.textContent = "Submitting...";
+
           var formData = {};
           svc.fields.forEach(function (field) {
             if (field.type === "section") return;
@@ -536,6 +634,29 @@
             var el = form.querySelector("[name='" + field.name + "']");
             formData[field.name] = el ? el.value : "";
           });
+
+          // Upload files first (if any), then submit request
+          if (_selectedFiles.length > 0) {
+            var fd = new FormData();
+            _selectedFiles.forEach(function (f) { fd.append("files", f); });
+
+            fetch("/api/upload", { method: "POST", body: fd })
+              .then(function (r) { return r.json(); })
+              .then(function (data) {
+                if (data.files) {
+                  formData._attachments = data.files;
+                }
+                completeSubmit(formData);
+              })
+              .catch(function () {
+                // Submit without files if upload fails
+                completeSubmit(formData);
+              });
+          } else {
+            completeSubmit(formData);
+          }
+
+          function completeSubmit(formData) {
 
           var result = eCatarman.submitRequest(serviceId, formData);
           if (result) {
@@ -600,6 +721,7 @@
               });
             }
           }
+          } // end completeSubmit
         });
 
         // Listen for server-side rejection (duplicate / rate-limited)

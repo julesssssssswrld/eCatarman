@@ -47,6 +47,51 @@ function parseBody(req) {
   });
 }
 
+// ── Helper: parse multipart form data (for file uploads) ─────────────────
+function parseMultipart(req) {
+  return new Promise((resolve, reject) => {
+    const contentType = req.headers["content-type"] || "";
+    const boundaryMatch = contentType.match(/boundary=(.+)/);
+    if (!boundaryMatch) return reject(new Error("No boundary in content-type"));
+    const boundary = "--" + boundaryMatch[1];
+
+    const chunks = [];
+    req.on("data", (chunk) => chunks.push(chunk));
+    req.on("end", () => {
+      const buffer = Buffer.concat(chunks);
+      const parts = [];
+      const boundaryBuf = Buffer.from(boundary);
+      let start = 0;
+
+      // Split by boundary
+      while (true) {
+        const idx = buffer.indexOf(boundaryBuf, start);
+        if (idx === -1) break;
+        if (start > 0) {
+          const partData = buffer.slice(start, idx - 2); // -2 for \r\n
+          const headerEnd = partData.indexOf("\r\n\r\n");
+          if (headerEnd !== -1) {
+            const headers = partData.slice(0, headerEnd).toString();
+            const body = partData.slice(headerEnd + 4);
+            const nameMatch = headers.match(/name="([^"]+)"/);
+            const filenameMatch = headers.match(/filename="([^"]+)"/);
+            const typeMatch = headers.match(/Content-Type:\s*(.+)/i);
+            parts.push({
+              name: nameMatch ? nameMatch[1] : "unknown",
+              filename: filenameMatch ? filenameMatch[1] : null,
+              contentType: typeMatch ? typeMatch[1].trim() : null,
+              data: body,
+            });
+          }
+        }
+        start = idx + boundaryBuf.length + 2; // +2 for \r\n
+      }
+      resolve(parts);
+    });
+    req.on("error", reject);
+  });
+}
+
 // ── Helper: send JSON response ───────────────────────────────────────────
 function sendJSON(res, statusCode, data) {
   res.writeHead(statusCode, {
@@ -270,6 +315,73 @@ const server = http.createServer(async (req, res) => {
   // ── GET /api/demo-status — Check if demo data is loaded ─────────────
   if (urlPath === "/api/demo-status" && req.method === "GET") {
     sendJSON(res, 200, { demoLoaded: db.isDemoLoaded() });
+    return;
+  }
+
+  // =====================================================================
+  //  FILE UPLOAD API
+  // =====================================================================
+
+  // ── POST /api/upload — Upload supporting documents ──────────────────
+  if (urlPath === "/api/upload" && req.method === "POST") {
+    try {
+      const parts = await parseMultipart(req);
+      const uploadDir = path.join(__dirname, "uploads");
+      if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+
+      const savedFiles = [];
+      const ALLOWED_TYPES = [
+        "application/pdf",
+        "image/jpeg", "image/jpg", "image/png", "image/webp",
+        "application/msword",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      ];
+      const MAX_SIZE = 10 * 1024 * 1024; // 10MB per file
+
+      for (const part of parts) {
+        if (!part.filename) continue;
+        if (!ALLOWED_TYPES.includes(part.contentType)) {
+          return sendJSON(res, 400, { error: `File type not allowed: ${part.contentType}` });
+        }
+        if (part.data.length > MAX_SIZE) {
+          return sendJSON(res, 400, { error: `File too large: ${part.filename} (max 10MB)` });
+        }
+
+        const ext = path.extname(part.filename).toLowerCase();
+        const safeName = Date.now() + "-" + Math.random().toString(36).substring(2, 8) + ext;
+        const filePath = path.join(uploadDir, safeName);
+        fs.writeFileSync(filePath, part.data);
+
+        savedFiles.push({
+          originalName: part.filename,
+          storedName: safeName,
+          url: "/uploads/" + safeName,
+          size: part.data.length,
+          type: part.contentType,
+        });
+        console.log(`📎 Uploaded: ${part.filename} → ${safeName}`);
+      }
+
+      sendJSON(res, 200, { files: savedFiles });
+    } catch (err) {
+      sendJSON(res, 500, { error: err.message });
+    }
+    return;
+  }
+
+  // ── Serve uploaded files: /uploads/* ─────────────────────────────────
+  if (urlPath.startsWith("/uploads/") && req.method === "GET") {
+    const fileName = path.basename(urlPath);
+    const filePath = path.join(__dirname, "uploads", fileName);
+    if (fs.existsSync(filePath)) {
+      const ext = path.extname(fileName).toLowerCase();
+      const mime = mimeTypes[ext] || "application/octet-stream";
+      res.writeHead(200, { "Content-Type": mime });
+      fs.createReadStream(filePath).pipe(res);
+    } else {
+      res.writeHead(404);
+      res.end("File not found");
+    }
     return;
   }
 

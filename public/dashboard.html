@@ -992,10 +992,30 @@
         html += '<p class="svc-module__sub-title">Application Data</p>';
         html += '<div class="track-result__details">';
         Object.keys(r.formData).forEach(function (key) {
+          if (key === "_attachments") return; // show separately
           var cleanLabel = getFieldLabel(r.serviceId, key);
           html += '<div class="track-detail"><div class="track-detail__label">' + cleanLabel + '</div><div class="track-detail__value">' + (r.formData[key] || "—") + '</div></div>';
         });
         html += '</div>';
+
+        // Attached documents
+        if (r.formData._attachments && r.formData._attachments.length > 0) {
+          html += '<p class="svc-module__sub-title">📎 Attached Documents</p>';
+          html += '<div style="display:flex;flex-direction:column;gap:0.5rem;margin-bottom:1rem;">';
+          r.formData._attachments.forEach(function (file) {
+            var icon = file.type === "application/pdf" ? "📄" : (file.type && file.type.startsWith("image/") ? "🖼️" : "📎");
+            var sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+            html += '<a href="' + file.url + '" target="_blank" style="display:flex;align-items:center;gap:0.75rem;padding:0.625rem 1rem;background:var(--slate-50);border:1px solid var(--slate-200);border-radius:0.75rem;text-decoration:none;transition:all 0.2s;">'
+              + '<span style="font-size:1.25rem;">' + icon + '</span>'
+              + '<div style="flex:1;min-width:0;">'
+              + '<p style="font-weight:700;font-size:0.8125rem;color:var(--slate-700);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:0;">' + file.originalName + '</p>'
+              + '<p style="font-size:0.6875rem;color:var(--slate-400);margin:0;">' + sizeMB + ' MB</p>'
+              + '</div>'
+              + '<span style="font-size:0.75rem;font-weight:700;color:var(--teal-600);">View ↗</span>'
+              + '</a>';
+          });
+          html += '</div>';
+        }
 
         // Timeline
         if (r.notes.length > 0) {
