@@ -292,7 +292,10 @@
 
       // Helper: can this user manage (edit/delete/route) a request?
       function canManage(request) {
-        return isAdmin || request.departmentId === myDept;
+        if (isAdmin) return true;
+        if (request.departmentId === myDept) return true;
+        if (request.routedTo && request.routedTo.indexOf(myDept) >= 0) return true;
+        return false;
       }
 
       // Helper: get requests visible to this user
@@ -300,7 +303,7 @@
       function getMyRequests() {
         if (isAdmin) return eCatarman.getRequests();
         return eCatarman.getRequests().filter(function (r) {
-          return r.departmentId === myDept;
+          return r.departmentId === myDept || (r.routedTo && r.routedTo.indexOf(myDept) >= 0);
         });
       }
 
