@@ -466,36 +466,59 @@ const eCatarman = (function () {
   };
 
   /* ====================================================================
-     LOCAL STORAGE KEYS
+     LOCAL STORAGE KEYS (auth only — requests are on server now)
      ==================================================================== */
   const KEYS = {
-    REQUESTS: "ecatarman_requests",
     AUTH: "ecatarman_auth",
-    DEMO_LOADED: "ecatarman_demo_loaded",
   };
 
   /* ====================================================================
-     REQUEST TRACKING SYSTEM
+     REQUEST TRACKING SYSTEM — Server-backed with local cache
      ==================================================================== */
+
+  // Local cache — populated from server on init
+  var _requestCache = [];
+  var _cacheReady = false;
 
   function generateTransactionId() {
     const year = new Date().getFullYear();
-    const requests = getRequests();
-    const num = String(requests.length + 1).padStart(4, "0");
+    const num = String(_requestCache.length + 1).padStart(4, "0");
     return "TXN-" + year + "-" + num;
   }
 
+  // Synchronous read from cache (used by all existing code)
   function getRequests() {
-    try {
-      const data = localStorage.getItem(KEYS.REQUESTS);
-      return data ? JSON.parse(data) : [];
-    } catch (e) {
-      return [];
-    }
+    return _requestCache;
   }
 
-  function saveRequests(requests) {
-    localStorage.setItem(KEYS.REQUESTS, JSON.stringify(requests));
+  // Sync cache from server
+  function syncFromServer(callback) {
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "/api/requests", false); // synchronous for compatibility
+    try {
+      xhr.send();
+      if (xhr.status === 200) {
+        _requestCache = JSON.parse(xhr.responseText);
+        _cacheReady = true;
+      }
+    } catch (e) {
+      console.warn("⚠ Server sync failed, using cache:", e.message);
+    }
+    if (callback) callback();
+  }
+
+  // Async sync (for background refreshes)
+  function syncFromServerAsync(callback) {
+    fetch("/api/requests")
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        _requestCache = data;
+        _cacheReady = true;
+        if (callback) callback();
+      })
+      .catch(function (e) {
+        console.warn("⚠ Async sync failed:", e.message);
+      });
   }
 
   function submitRequest(serviceId, formData) {
@@ -516,120 +539,121 @@ const eCatarman = (function () {
       submittedAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       notes: [],
-      routedTo: [], // cross-department routing
+      routedTo: [],
     };
 
-    const requests = getRequests();
-    requests.push(request);
-    saveRequests(requests);
+    // Add to cache immediately
+    _requestCache.push(request);
+
+    // Persist to server (async fire-and-forget)
+    fetch("/api/requests", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(request),
+    }).catch(function (e) { console.warn("Server save failed:", e.message); });
+
     return request;
   }
 
   function getRequestById(transactionId) {
-    var requests = getRequests();
-    return requests.find(function (r) { return r.id === transactionId; }) || null;
+    return _requestCache.find(function (r) { return r.id === transactionId; }) || null;
   }
 
   function getRequestsByDept(departmentId) {
-    return getRequests().filter(function (r) {
+    return _requestCache.filter(function (r) {
       return r.departmentId === departmentId || r.routedTo.indexOf(departmentId) >= 0;
     });
   }
 
   function getRequestsByStatus(status) {
-    return getRequests().filter(function (r) { return r.status === status; });
+    return _requestCache.filter(function (r) { return r.status === status; });
   }
 
   function updateRequestStatus(transactionId, newStatus, note) {
-    const requests = getRequests();
-    const idx = requests.findIndex(function (r) { return r.id === transactionId; });
+    const idx = _requestCache.findIndex(function (r) { return r.id === transactionId; });
     if (idx === -1) return null;
-    requests[idx].status = newStatus;
-    requests[idx].updatedAt = new Date().toISOString();
+    _requestCache[idx].status = newStatus;
+    _requestCache[idx].updatedAt = new Date().toISOString();
     if (note) {
-      requests[idx].notes.push({
+      _requestCache[idx].notes.push({
         text: note,
         status: newStatus,
         timestamp: new Date().toISOString(),
       });
     }
-    saveRequests(requests);
-    return requests[idx];
+
+    // Persist to server
+    fetch("/api/requests/" + transactionId, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        status: _requestCache[idx].status,
+        updatedAt: _requestCache[idx].updatedAt,
+        notes: _requestCache[idx].notes,
+      }),
+    }).catch(function (e) { console.warn("Server update failed:", e.message); });
+
+    return _requestCache[idx];
   }
 
   function routeRequest(transactionId, targetDeptId, note) {
-    const requests = getRequests();
-    const idx = requests.findIndex(function (r) { return r.id === transactionId; });
+    const idx = _requestCache.findIndex(function (r) { return r.id === transactionId; });
     if (idx === -1) return null;
-    if (requests[idx].routedTo.indexOf(targetDeptId) === -1) {
-      requests[idx].routedTo.push(targetDeptId);
+    if (_requestCache[idx].routedTo.indexOf(targetDeptId) === -1) {
+      _requestCache[idx].routedTo.push(targetDeptId);
     }
-    requests[idx].updatedAt = new Date().toISOString();
+    _requestCache[idx].updatedAt = new Date().toISOString();
     const dept = departments.find(function (d) { return d.id === targetDeptId; });
-    requests[idx].notes.push({
+    _requestCache[idx].notes.push({
       text: note || "Routed to " + (dept ? dept.shortName : targetDeptId),
-      status: requests[idx].status,
+      status: _requestCache[idx].status,
       timestamp: new Date().toISOString(),
     });
-    saveRequests(requests);
-    return requests[idx];
+
+    // Persist to server
+    fetch("/api/requests/" + transactionId, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        routedTo: _requestCache[idx].routedTo,
+        updatedAt: _requestCache[idx].updatedAt,
+        notes: _requestCache[idx].notes,
+      }),
+    }).catch(function (e) { console.warn("Server route failed:", e.message); });
+
+    return _requestCache[idx];
   }
 
   function deleteRequest(transactionId) {
-    const requests = getRequests().filter(function (r) { return r.id !== transactionId; });
-    saveRequests(requests);
+    _requestCache = _requestCache.filter(function (r) { return r.id !== transactionId; });
+
+    // Persist to server
+    fetch("/api/requests/" + transactionId, {
+      method: "DELETE",
+    }).catch(function (e) { console.warn("Server delete failed:", e.message); });
   }
 
   /* ====================================================================
-     ANALYTICS
-     ==================================================================== */
-  function getAnalytics() {
-    var requests = getRequests();
-    var total = requests.length;
-    var byStatus = {};
-    var byDept = {};
-    var byService = {};
-
-    Object.values(STATUS).forEach(function (s) { byStatus[s] = 0; });
-
-    requests.forEach(function (r) {
-      if (byStatus[r.status] !== undefined) byStatus[r.status]++;
-      byDept[r.departmentId] = (byDept[r.departmentId] || 0) + 1;
-      byService[r.serviceId] = (byService[r.serviceId] || 0) + 1;
-    });
-
-    return { total: total, byStatus: byStatus, byDept: byDept, byService: byService };
-  }
-
-  /* ====================================================================
-     AUTH (Simple demo auth)
-     ==================================================================== */
-  function login(username, password) {
-    if (username === "admin" && password === "admin") {
-      localStorage.setItem(KEYS.AUTH, JSON.stringify({ user: "admin", role: "administrator", loggedIn: true }));
-      return true;
-    }
-    return false;
-  }
-
-  function logout() {
-    localStorage.removeItem(KEYS.AUTH);
-  }
-
-  function isLoggedIn() {
-    try {
-      const auth = JSON.parse(localStorage.getItem(KEYS.AUTH));
-      return auth && auth.loggedIn;
-    } catch (e) {
-      return false;
-    }
-  }
-
-  /* ====================================================================
-     DEMO DATA SEEDER
+     DEMO DATA SEEDER — Server-side
      ==================================================================== */
   function loadDemoData() {
-    if (localStorage.getItem(KEYS.DEMO_LOADED)) return;
+    // Check server if demo is already loaded
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "/api/demo-status", false);
+    try {
+      xhr.send();
+      if (xhr.status === 200) {
+        var status = JSON.parse(xhr.responseText);
+        if (status.demoLoaded) {
+          // Demo already on server — just sync cache
+          syncFromServer();
+          return;
+        }
+      }
+    } catch (e) {
+      // Server not available — skip seeding
+      return;
+    }
 
     var demoRequests = [
       {
@@ -741,8 +765,63 @@ const eCatarman = (function () {
       },
     ];
 
-    saveRequests(demoRequests);
-    localStorage.setItem(KEYS.DEMO_LOADED, "true");
+    // Seed to server
+    var seedXhr = new XMLHttpRequest();
+    seedXhr.open("POST", "/api/seed", false);
+    seedXhr.setRequestHeader("Content-Type", "application/json");
+    try {
+      seedXhr.send(JSON.stringify({ requests: demoRequests }));
+    } catch (e) {
+      console.warn("⚠ Seed failed:", e.message);
+    }
+
+    // Sync cache from server
+    syncFromServer();
+  }
+
+  /* ====================================================================
+     ANALYTICS
+     ==================================================================== */
+  function getAnalytics() {
+    var requests = getRequests();
+    var total = requests.length;
+    var byStatus = {};
+    var byDept = {};
+    var byService = {};
+
+    Object.values(STATUS).forEach(function (s) { byStatus[s] = 0; });
+
+    requests.forEach(function (r) {
+      if (byStatus[r.status] !== undefined) byStatus[r.status]++;
+      byDept[r.departmentId] = (byDept[r.departmentId] || 0) + 1;
+      byService[r.serviceId] = (byService[r.serviceId] || 0) + 1;
+    });
+
+    return { total: total, byStatus: byStatus, byDept: byDept, byService: byService };
+  }
+
+  /* ====================================================================
+     AUTH (Simple demo auth — stays in localStorage, session-based)
+     ==================================================================== */
+  function login(username, password) {
+    if (username === "admin" && password === "admin") {
+      localStorage.setItem(KEYS.AUTH, JSON.stringify({ user: "admin", role: "administrator", loggedIn: true }));
+      return true;
+    }
+    return false;
+  }
+
+  function logout() {
+    localStorage.removeItem(KEYS.AUTH);
+  }
+
+  function isLoggedIn() {
+    try {
+      const auth = JSON.parse(localStorage.getItem(KEYS.AUTH));
+      return auth && auth.loggedIn;
+    } catch (e) {
+      return false;
+    }
   }
 
   /* ====================================================================
@@ -775,7 +854,7 @@ const eCatarman = (function () {
   /* ====================================================================
      PUBLIC API
      ==================================================================== */
-  // Auto-load demo data
+  // Auto-load demo data (seeds to server if first run)
   loadDemoData();
 
   return {
@@ -803,5 +882,7 @@ const eCatarman = (function () {
     timeAgo: timeAgo,
     generateTransactionId: generateTransactionId,
     loadDemoData: loadDemoData,
+    syncFromServer: syncFromServer,
+    syncFromServerAsync: syncFromServerAsync,
   };
 })();

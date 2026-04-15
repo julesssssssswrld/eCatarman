@@ -4,6 +4,7 @@ const http = require("http");
 const fs = require("fs");
 const path = require("path");
 const emailService = require("./email");
+const db = require("./db");
 
 const PORT = 3000;
 
@@ -51,7 +52,7 @@ function sendJSON(res, statusCode, data) {
   res.writeHead(statusCode, {
     "Content-Type": "application/json",
     "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type",
   });
   res.end(JSON.stringify(data));
@@ -64,12 +65,101 @@ const server = http.createServer(async (req, res) => {
   if (req.method === "OPTIONS") {
     res.writeHead(204, {
       "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type",
     });
     res.end();
     return;
   }
+
+  // =====================================================================
+  //  DATABASE API — Request CRUD
+  // =====================================================================
+
+  // ── GET /api/requests — List all requests ───────────────────────────
+  if (urlPath === "/api/requests" && req.method === "GET") {
+    sendJSON(res, 200, db.getRequests());
+    return;
+  }
+
+  // ── GET /api/requests/:id — Get single request ──────────────────────
+  if (urlPath.startsWith("/api/requests/") && req.method === "GET") {
+    const id = urlPath.split("/api/requests/")[1];
+    const request = db.getRequestById(id);
+    if (!request) return sendJSON(res, 404, { error: "Request not found" });
+    sendJSON(res, 200, request);
+    return;
+  }
+
+  // ── POST /api/requests — Create new request ─────────────────────────
+  if (urlPath === "/api/requests" && req.method === "POST") {
+    try {
+      const request = await parseBody(req);
+      if (!request.id || !request.serviceId) {
+        return sendJSON(res, 400, { error: "Missing required fields" });
+      }
+      const created = db.createRequest(request);
+      console.log(`📝 New request: ${created.id} — ${created.serviceName}`);
+      sendJSON(res, 201, created);
+    } catch (err) {
+      sendJSON(res, 500, { error: err.message });
+    }
+    return;
+  }
+
+  // ── PUT /api/requests/:id — Update request ──────────────────────────
+  if (urlPath.startsWith("/api/requests/") && req.method === "PUT") {
+    try {
+      const id = urlPath.split("/api/requests/")[1];
+      const updates = await parseBody(req);
+      const updated = db.updateRequest(id, updates);
+      if (!updated) return sendJSON(res, 404, { error: "Request not found" });
+      console.log(`✏️  Updated: ${id} — status: ${updated.status}`);
+      sendJSON(res, 200, updated);
+    } catch (err) {
+      sendJSON(res, 500, { error: err.message });
+    }
+    return;
+  }
+
+  // ── DELETE /api/requests/:id — Delete request ───────────────────────
+  if (urlPath.startsWith("/api/requests/") && req.method === "DELETE") {
+    const id = urlPath.split("/api/requests/")[1];
+    const deleted = db.deleteRequest(id);
+    if (!deleted) return sendJSON(res, 404, { error: "Request not found" });
+    console.log(`🗑️  Deleted: ${id}`);
+    sendJSON(res, 200, { success: true });
+    return;
+  }
+
+  // ── POST /api/seed — Seed demo data ─────────────────────────────────
+  if (urlPath === "/api/seed" && req.method === "POST") {
+    try {
+      const { requests, force } = await parseBody(req);
+      if (!force && db.isDemoLoaded()) {
+        return sendJSON(res, 200, { seeded: false, message: "Demo already loaded" });
+      }
+      if (Array.isArray(requests)) {
+        requests.forEach((r) => db.createRequest(r));
+        db.markDemoLoaded();
+        console.log(`🌱 Seeded ${requests.length} demo requests`);
+      }
+      sendJSON(res, 200, { seeded: true, count: requests.length });
+    } catch (err) {
+      sendJSON(res, 500, { error: err.message });
+    }
+    return;
+  }
+
+  // ── GET /api/demo-status — Check if demo data is loaded ─────────────
+  if (urlPath === "/api/demo-status" && req.method === "GET") {
+    sendJSON(res, 200, { demoLoaded: db.isDemoLoaded() });
+    return;
+  }
+
+  // =====================================================================
+  //  EMAIL API
+  // =====================================================================
 
   // ── API: Send submission confirmation email ──────────────────────────
   if (urlPath === "/api/email/submission" && req.method === "POST") {
@@ -165,4 +255,5 @@ const server = http.createServer(async (req, res) => {
 
 server.listen(PORT, () => {
   console.log(`Catarman Portal running at http://localhost:${PORT}`);
+  console.log(`📁 Database: ${path.resolve("db.json")}`);
 });
