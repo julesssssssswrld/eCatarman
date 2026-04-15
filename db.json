@@ -6,7 +6,7 @@
       "serviceName": "Business Permits",
       "departmentId": "bplo",
       "departmentName": "Business Permit & Licensing Office",
-      "status": "Processing",
+      "status": "For Release",
       "formData": {
         "serviceType": "New Business Permit",
         "modeOfPayment": "Annual",
@@ -28,7 +28,7 @@
       "citizenName": "Maria Santos",
       "citizenEmail": "maria@email.com",
       "submittedAt": "2026-04-10T08:30:00.000Z",
-      "updatedAt": "2026-04-12T14:20:00.000Z",
+      "updatedAt": "2026-04-15T03:11:28.766Z",
       "notes": [
         {
           "text": "Application received and verified.",
@@ -44,6 +44,11 @@
           "text": "Processing fees computed. Awaiting payment.",
           "status": "Processing",
           "timestamp": "2026-04-12T14:20:00.000Z"
+        },
+        {
+          "text": "Quick advanced to For Release",
+          "status": "For Release",
+          "timestamp": "2026-04-15T03:11:28.755Z"
         }
       ],
       "routedTo": [
@@ -201,8 +206,19 @@
       "citizenName": "Elena Magtanggol",
       "citizenEmail": "elena@email.com",
       "submittedAt": "2026-04-15T06:10:00.000Z",
-      "updatedAt": "2026-04-15T06:10:00.000Z",
-      "notes": [],
+      "updatedAt": "2026-04-15T03:12:27.116Z",
+      "notes": [
+        {
+          "text": "Status updated to Under Review",
+          "status": "Under Review",
+          "timestamp": "2026-04-15T03:12:25.799Z"
+        },
+        {
+          "text": "Status updated to Received",
+          "status": "Received",
+          "timestamp": "2026-04-15T03:12:27.111Z"
+        }
+      ],
       "routedTo": []
     },
     {
