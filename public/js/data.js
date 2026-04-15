@@ -801,11 +801,29 @@ const eCatarman = (function () {
   }
 
   /* ====================================================================
-     AUTH (Simple demo auth — stays in localStorage, session-based)
+     AUTH — Role-Based Multi-Account System
+     Each department gets its own login. "admin" is superadmin (sees all).
      ==================================================================== */
+  var ACCOUNTS = {
+    admin:     { password: "admin",     role: "administrator", department: null,             label: "Super Admin" },
+    treasurer: { password: "treasurer", role: "department",    department: "treasurer",      label: "Municipal Treasurer's Office" },
+    civil:     { password: "civil",     role: "department",    department: "civil-registry",  label: "Civil Registry Office" },
+    bplo:      { password: "bplo",      role: "department",    department: "bplo",            label: "Business Permit & Licensing Office" },
+    obo:       { password: "obo",       role: "department",    department: "obo",             label: "Office of the Building Official" },
+    assessor:  { password: "assessor",  role: "department",    department: "assessor",        label: "Municipal Assessor's Office" },
+    zoning:    { password: "zoning",    role: "department",    department: "zoning",          label: "Zoning Office" },
+  };
+
   function login(username, password) {
-    if (username === "admin" && password === "admin") {
-      localStorage.setItem(KEYS.AUTH, JSON.stringify({ user: "admin", role: "administrator", loggedIn: true }));
+    var account = ACCOUNTS[username];
+    if (account && account.password === password) {
+      localStorage.setItem(KEYS.AUTH, JSON.stringify({
+        user: username,
+        role: account.role,
+        department: account.department,
+        label: account.label,
+        loggedIn: true,
+      }));
       return true;
     }
     return false;
@@ -817,10 +835,18 @@ const eCatarman = (function () {
 
   function isLoggedIn() {
     try {
-      const auth = JSON.parse(localStorage.getItem(KEYS.AUTH));
+      var auth = JSON.parse(localStorage.getItem(KEYS.AUTH));
       return auth && auth.loggedIn;
     } catch (e) {
       return false;
+    }
+  }
+
+  function getAuth() {
+    try {
+      return JSON.parse(localStorage.getItem(KEYS.AUTH)) || null;
+    } catch (e) {
+      return null;
     }
   }
 
@@ -877,6 +903,7 @@ const eCatarman = (function () {
     login: login,
     logout: logout,
     isLoggedIn: isLoggedIn,
+    getAuth: getAuth,
     formatDate: formatDate,
     formatDateTime: formatDateTime,
     timeAgo: timeAgo,

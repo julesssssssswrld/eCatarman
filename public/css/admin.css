@@ -472,7 +472,15 @@
   background: var(--teal-50);
   color: var(--teal-700);
 }
-
+.admin-table__action-btn--readonly {
+  background: transparent;
+  border: 1px solid var(--slate-200);
+  color: var(--slate-400);
+}
+.admin-table__action-btn--readonly:hover {
+  background: var(--slate-50);
+  color: var(--slate-600);
+}
 /* Filter row */
 .admin-filter-row {
   display: flex;

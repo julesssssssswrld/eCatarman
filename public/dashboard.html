@@ -15,7 +15,7 @@
   <aside class="admin-sidebar" id="admin-sidebar">
     <div class="admin-sidebar__header">
       <a class="admin-sidebar__logo">e<span>Catarman</span></a>
-      <span class="admin-sidebar__badge">Admin</span>
+      <span class="admin-sidebar__badge" id="sidebar-badge">Admin</span>
     </div>
 
     <nav class="admin-sidebar__nav">
@@ -65,8 +65,8 @@
         <div class="admin-topbar__user">
           <div class="admin-topbar__avatar" id="user-avatar"></div>
           <div>
-            <div class="admin-topbar__name">Administrator</div>
-            <div class="admin-topbar__role">System Admin</div>
+            <div class="admin-topbar__name" id="user-name">Administrator</div>
+            <div class="admin-topbar__role" id="user-role">System Admin</div>
           </div>
         </div>
       </div>
@@ -242,6 +242,42 @@
     document.addEventListener("DOMContentLoaded", function () {
 
       /* ================================================================
+         ROLE-BASED AUTH CONTEXT
+         ================================================================ */
+      var auth = eCatarman.getAuth() || {};
+      var isAdmin = auth.role === "administrator";
+      var myDept = auth.department; // null for admin (sees all)
+
+      // Update topbar user info
+      document.getElementById("user-name").textContent = auth.label || "Administrator";
+      document.getElementById("user-role").textContent = isAdmin ? "Super Admin" : "Department Officer";
+
+      // Update sidebar badge
+      if (!isAdmin && myDept) {
+        var myDeptObj = eCatarman.departments.find(function (d) { return d.id === myDept; });
+        document.getElementById("sidebar-badge").textContent = myDeptObj ? myDeptObj.shortName : "Dept";
+      }
+
+      // Helper: can this user manage (edit/delete/route) a request?
+      function canManage(request) {
+        return isAdmin || request.departmentId === myDept;
+      }
+
+      // Helper: get requests visible to this user
+      // Admin sees all. Department user sees own dept requests.
+      function getMyRequests() {
+        if (isAdmin) return eCatarman.getRequests();
+        return eCatarman.getRequests().filter(function (r) {
+          return r.departmentId === myDept;
+        });
+      }
+
+      // Helper: get ALL requests (for cross-department read-only view)
+      function getAllRequests() {
+        return eCatarman.getRequests();
+      }
+
+      /* ================================================================
          ACTIVITY LOG (localStorage)
          ================================================================ */
       var LOG_KEY = "ecatarman_activity_log";
@@ -374,17 +410,22 @@
          RENDER DASHBOARD
          ================================================================ */
       function renderDashboard() {
-        var analytics = eCatarman.getAnalytics();
+        // Compute analytics from the user's filtered request set
+        var myRequests = getMyRequests();
+        var total = myRequests.length;
+        var byStatus = {};
+        Object.values(eCatarman.STATUS).forEach(function (s) { byStatus[s] = 0; });
+        myRequests.forEach(function (r) { if (byStatus[r.status] !== undefined) byStatus[r.status]++; });
 
         // Stats row
         var statsRow = document.getElementById("stats-row");
         statsRow.innerHTML = "";
 
         var statItems = [
-          { label: "Total Requests", value: analytics.total, icon: "clipboardList", color: "teal" },
-          { label: "Pending", value: (analytics.byStatus["Received"] || 0) + (analytics.byStatus["Under Review"] || 0), icon: "clock", color: "amber" },
-          { label: "Processing", value: analytics.byStatus["Processing"] || 0, icon: "activity", color: "blue" },
-          { label: "Completed", value: analytics.byStatus["Completed"] || 0, icon: "check", color: "emerald" },
+          { label: "Total Requests", value: total, icon: "clipboardList", color: "teal" },
+          { label: "Pending", value: (byStatus["Received"] || 0) + (byStatus["Under Review"] || 0), icon: "clock", color: "amber" },
+          { label: "Processing", value: byStatus["Processing"] || 0, icon: "activity", color: "blue" },
+          { label: "Completed", value: byStatus["Completed"] || 0, icon: "check", color: "emerald" },
         ];
 
         statItems.forEach(function (s) {
@@ -399,14 +440,14 @@
         });
 
         // Request count badge
-        document.getElementById("nav-count-requests").textContent = analytics.total;
+        document.getElementById("nav-count-requests").textContent = total;
 
         // Status chart (bar chart)
         var statusChart = document.getElementById("status-chart");
         statusChart.innerHTML = "";
-        var maxStatus = Math.max.apply(null, Object.values(analytics.byStatus).concat([1]));
-        Object.keys(analytics.byStatus).forEach(function (status) {
-          var count = analytics.byStatus[status];
+        var maxStatus = Math.max.apply(null, Object.values(byStatus).concat([1]));
+        Object.keys(byStatus).forEach(function (status) {
+          var count = byStatus[status];
           var color = eCatarman.STATUS_COLORS[status] || "blue";
           var pct = Math.round((count / maxStatus) * 100);
           var row = document.createElement("div");
@@ -418,12 +459,15 @@
           statusChart.appendChild(row);
         });
 
-        // Department chart
+        // Department chart (admin sees all depts, dept user sees only own)
         var deptChart = document.getElementById("dept-chart");
         deptChart.innerHTML = "";
-        var maxDept = Math.max.apply(null, Object.values(analytics.byDept).concat([1]));
+        var byDept = {};
+        myRequests.forEach(function (r) { byDept[r.departmentId] = (byDept[r.departmentId] || 0) + 1; });
+        var maxDept = Math.max.apply(null, Object.values(byDept).concat([1]));
         eCatarman.departments.forEach(function (dept) {
-          var count = analytics.byDept[dept.id] || 0;
+          var count = byDept[dept.id] || 0;
+          if (!isAdmin && dept.id !== myDept) return; // dept users only see own
           var pct = Math.round((count / maxDept) * 100);
           var row = document.createElement("div");
           row.className = "chart-bar-row";
@@ -441,7 +485,7 @@
       function renderRecentRequests() {
         var tbody = document.getElementById("recent-tbody");
         tbody.innerHTML = "";
-        var requests = eCatarman.getRequests().slice().reverse().slice(0, 6);
+        var requests = getMyRequests().slice().reverse().slice(0, 6);
 
         var emptyEl = document.getElementById("recent-empty");
         var tableEl = document.getElementById("recent-table-wrap");
@@ -466,7 +510,7 @@
         var deptFilter = document.getElementById("filter-dept").value;
         var searchQuery = document.getElementById("search-requests").value.trim().toLowerCase();
 
-        var requests = eCatarman.getRequests().slice().reverse();
+        var requests = getAllRequests().slice().reverse();
         if (statusFilter) requests = requests.filter(function (r) { return r.status === statusFilter; });
         if (deptFilter) requests = requests.filter(function (r) { return r.departmentId === deptFilter; });
         if (searchQuery) {
@@ -530,12 +574,17 @@
         }
         html += '<td>' + eCatarman.timeAgo(r.submittedAt) + '</td>';
         html += '<td class="admin-table__actions-cell">';
-        html += '<button class="admin-table__action-btn" data-txn="' + r.id + '">Manage</button>';
 
-        // Quick-advance button (only for non-completed)
-        if (r.status !== "Completed") {
-          var nextStatus = getNextStatus(r.status);
-          html += '<button class="admin-table__quick-btn" data-txn="' + r.id + '" data-next="' + nextStatus + '" title="Advance to ' + nextStatus + '">→ ' + nextStatus.split(" ").pop() + '</button>';
+        if (canManage(r)) {
+          html += '<button class="admin-table__action-btn" data-txn="' + r.id + '">Manage</button>';
+          // Quick-advance button (only for non-completed, own-department)
+          if (r.status !== "Completed") {
+            var nextStatus = getNextStatus(r.status);
+            html += '<button class="admin-table__quick-btn" data-txn="' + r.id + '" data-next="' + nextStatus + '" title="Advance to ' + nextStatus + '">→ ' + nextStatus.split(" ").pop() + '</button>';
+          }
+        } else {
+          // Read-only: can view but not manage
+          html += '<button class="admin-table__action-btn admin-table__action-btn--readonly" data-txn="' + r.id + '">View</button>';
         }
 
         html += '</td>';
@@ -774,44 +823,53 @@
           html += '</div>';
         }
 
-        // Update Status Actions
-        html += '<p class="svc-module__sub-title">Update Status</p>';
-        html += '<div class="admin-status-actions" id="status-actions">';
-        var statuses = ["Received", "Under Review", "Processing", "For Release", "Completed"];
-        statuses.forEach(function (s) {
-          var cls = s === r.status ? "admin-status-btn admin-status-btn--active" : "admin-status-btn";
-          html += '<button class="' + cls + '" data-status="' + s + '" data-txn="' + r.id + '">' + s + '</button>';
-        });
-        html += '</div>';
+        // === ACTIONS (only if this user can manage this request) ===
+        if (canManage(r)) {
+          // Update Status Actions
+          html += '<p class="svc-module__sub-title">Update Status</p>';
+          html += '<div class="admin-status-actions" id="status-actions">';
+          var statuses = ["Received", "Under Review", "Processing", "For Release", "Completed"];
+          statuses.forEach(function (s) {
+            var cls = s === r.status ? "admin-status-btn admin-status-btn--active" : "admin-status-btn";
+            html += '<button class="' + cls + '" data-status="' + s + '" data-txn="' + r.id + '">' + s + '</button>';
+          });
+          html += '</div>';
 
-        // Route to department
-        html += '<p class="svc-module__sub-title">Route to Department</p>';
-        html += '<div class="admin-route-row">';
-        html += '<select class="admin-filter-select" id="route-dept-select">';
-        html += '<option value="">Select department...</option>';
-        eCatarman.departments.forEach(function (d) {
-          if (d.id !== r.departmentId) {
-            html += '<option value="' + d.id + '">' + d.shortName + ' — ' + d.name + '</option>';
+          // Route to department
+          html += '<p class="svc-module__sub-title">Route to Department</p>';
+          html += '<div class="admin-route-row">';
+          html += '<select class="admin-filter-select" id="route-dept-select">';
+          html += '<option value="">Select department...</option>';
+          eCatarman.departments.forEach(function (d) {
+            if (d.id !== r.departmentId) {
+              html += '<option value="' + d.id + '">' + d.shortName + ' — ' + d.name + '</option>';
+            }
+          });
+          html += '</select>';
+          html += '<button class="svc-module__btn svc-module__btn--apply" id="route-btn" data-txn="' + r.id + '" style="white-space:nowrap;">Route</button>';
+          html += '</div>';
+
+          // Add note
+          html += '<p class="svc-module__sub-title">Add Note</p>';
+          html += '<div class="admin-route-row">';
+          html += '<input type="text" class="form-input" id="note-input" placeholder="Enter a note for this request..." style="flex:1;">';
+          html += '<button class="svc-module__btn svc-module__btn--info" id="note-btn" data-txn="' + r.id + '" style="white-space:nowrap;">Add Note</button>';
+          html += '</div>';
+
+          // Action buttons row
+          html += '<div class="admin-modal-actions">';
+          if (r.status === "Completed") {
+            html += '<button class="svc-module__btn svc-module__btn--apply" id="print-btn" data-txn="' + r.id + '">Print Receipt</button>';
           }
-        });
-        html += '</select>';
-        html += '<button class="svc-module__btn svc-module__btn--apply" id="route-btn" data-txn="' + r.id + '" style="white-space:nowrap;">Route</button>';
-        html += '</div>';
-
-        // Add note
-        html += '<p class="svc-module__sub-title">Add Note</p>';
-        html += '<div class="admin-route-row">';
-        html += '<input type="text" class="form-input" id="note-input" placeholder="Enter a note for this request..." style="flex:1;">';
-        html += '<button class="svc-module__btn svc-module__btn--info" id="note-btn" data-txn="' + r.id + '" style="white-space:nowrap;">Add Note</button>';
-        html += '</div>';
-
-        // Action buttons row
-        html += '<div class="admin-modal-actions">';
-        if (r.status === "Completed") {
-          html += '<button class="svc-module__btn svc-module__btn--apply" id="print-btn" data-txn="' + r.id + '">Print Receipt</button>';
+          html += '<button class="svc-module__btn" id="delete-btn" data-txn="' + r.id + '" style="background:var(--rose-600);color:#fff;margin-left:auto;">Delete Request</button>';
+          html += '</div>';
+        } else {
+          // Read-only notice for cross-department viewing
+          html += '<div style="background:var(--amber-50);border:1px solid #fbbf24;border-radius:0.75rem;padding:1rem;margin-top:1rem;text-align:center;">';
+          html += '<div style="font-weight:800;color:#92400e;font-size:0.875rem;">🔒 Read-Only Access</div>';
+          html += '<div style="color:#92400e;font-size:0.8125rem;margin-top:0.25rem;">This request belongs to <strong>' + (dept ? dept.name : r.departmentId) + '</strong>. You can view the data but cannot modify it.</div>';
+          html += '</div>';
         }
-        html += '<button class="svc-module__btn" id="delete-btn" data-txn="' + r.id + '" style="background:var(--rose-600);color:#fff;margin-left:auto;">Delete Request</button>';
-        html += '</div>';
 
         body.innerHTML = html;
 
