@@ -138,6 +138,7 @@
               <option value="Processing">Processing</option>
               <option value="For Release">For Release</option>
               <option value="Completed">Completed</option>
+              <option value="Rejected">Rejected</option>
             </select>
             <select class="admin-filter-select" id="filter-dept">
               <option value="">All Departments</option>
@@ -612,8 +613,8 @@
 
         if (canManage(r)) {
           html += '<button class="admin-table__action-btn" data-txn="' + r.id + '">Manage</button>';
-          // Quick-advance button (only for non-completed, own-department)
-          if (r.status !== "Completed") {
+          // Quick-advance button (only for non-completed, non-rejected, own-department)
+          if (r.status !== "Completed" && r.status !== "Rejected") {
             var nextStatus = getNextStatus(r.status);
             html += '<button class="admin-table__quick-btn" data-txn="' + r.id + '" data-next="' + nextStatus + '" title="Advance to ' + nextStatus + '">→ ' + nextStatus.split(" ").pop() + '</button>';
           }
@@ -1053,6 +1054,32 @@
           });
           html += '</div>';
 
+          // Decline / Reject Section
+          if (r.status !== "Rejected") {
+            html += '<div style="margin-top:1rem;">';
+            html += '<button class="svc-module__btn" id="decline-toggle-btn" style="background:var(--rose-600);color:#fff;width:100%;font-weight:800;padding:0.75rem;border-radius:0.75rem;">✕ Decline Request</button>';
+            html += '<div id="decline-reason-box" style="display:none;margin-top:0.75rem;padding:1rem;background:var(--rose-50);border:1px solid var(--rose-200);border-radius:1rem;">';
+            html += '<label style="display:block;font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--rose-600);margin-bottom:0.5rem;">Reason for Declining *</label>';
+            html += '<textarea id="decline-reason-input" class="form-textarea" placeholder="Explain why this request is being declined..." style="border-color:var(--rose-200);min-height:5rem;margin-bottom:0.75rem;"></textarea>';
+            html += '<div style="display:flex;gap:0.75rem;justify-content:flex-end;">';
+            html += '<button class="svc-module__btn svc-module__btn--info" id="decline-cancel-btn">Cancel</button>';
+            html += '<button class="svc-module__btn" id="decline-confirm-btn" data-txn="' + r.id + '" style="background:var(--rose-600);color:#fff;">Confirm Decline</button>';
+            html += '</div>';
+            html += '</div>';
+            html += '</div>';
+          } else {
+            // Show existing rejection reason
+            var rejectionNote = "";
+            for (var ni = r.notes.length - 1; ni >= 0; ni--) {
+              if (r.notes[ni].status === "Rejected") { rejectionNote = r.notes[ni].text; break; }
+            }
+            html += '<div style="margin-top:1rem;padding:1rem;background:var(--rose-50);border:1px solid var(--rose-200);border-radius:1rem;">';
+            html += '<p style="font-weight:800;color:var(--rose-700);font-size:0.875rem;margin-bottom:0.25rem;">❌ Request Declined</p>';
+            html += '<p style="color:var(--rose-600);font-size:0.8125rem;">' + (rejectionNote || "No reason provided.") + '</p>';
+            html += '</div>';
+          }
+
+
           // Route to department
           html += '<p class="svc-module__sub-title">Route to Department</p>';
           html += '<div class="admin-route-row">';
@@ -1120,6 +1147,60 @@
             renderDashboard();
           });
         });
+
+        // Bind decline/reject buttons
+        var declineToggle = document.getElementById("decline-toggle-btn");
+        if (declineToggle) {
+          declineToggle.addEventListener("click", function () {
+            document.getElementById("decline-reason-box").style.display = "block";
+            declineToggle.style.display = "none";
+          });
+        }
+        var declineCancel = document.getElementById("decline-cancel-btn");
+        if (declineCancel) {
+          declineCancel.addEventListener("click", function () {
+            document.getElementById("decline-reason-box").style.display = "none";
+            if (declineToggle) declineToggle.style.display = "";
+          });
+        }
+        var declineConfirm = document.getElementById("decline-confirm-btn");
+        if (declineConfirm) {
+          declineConfirm.addEventListener("click", function () {
+            var reasonInput = document.getElementById("decline-reason-input");
+            var reason = reasonInput.value.trim();
+            if (!reason) {
+              reasonInput.style.borderColor = "var(--red-400)";
+              reasonInput.style.boxShadow = "0 0 0 4px rgba(248,113,113,0.15)";
+              reasonInput.placeholder = "⚠ Please provide a reason for declining.";
+              reasonInput.focus();
+              return;
+            }
+
+            var txn = declineConfirm.dataset.txn;
+            eCatarman.updateRequestStatus(txn, "Rejected", "Declined: " + reason);
+            logActivity("Declined", txn, r.citizenName + " — " + reason);
+            showToast("Request declined", "info");
+
+            // Send rejection email with reason
+            if (r.citizenEmail) {
+              fetch("/api/email/status", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  email: r.citizenEmail,
+                  citizenName: r.citizenName,
+                  serviceName: r.serviceName,
+                  newStatus: "Rejected",
+                  txnId: txn,
+                  note: "Your request has been declined.\n\nReason: " + reason + "\n\nIf you believe this is an error, please contact the relevant department or submit a new request with the correct information.",
+                }),
+              }).catch(function () {});
+            }
+
+            openDetailModal(txn);
+            renderDashboard();
+          });
+        }
 
         // Bind route button
         var routeBtn = document.getElementById("route-btn");
