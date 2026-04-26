@@ -1,2 +1,6 @@
-ecatarman.sqlite-shm
-ecatarman.sqlite-wal
+*.sqlite-shm
+*.sqlite-wal
+
+/node_modules/
+
+.env
